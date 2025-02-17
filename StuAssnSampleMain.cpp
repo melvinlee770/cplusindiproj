@@ -20,7 +20,8 @@ void printWelcomeMsg();
 int printMainMenuOptions();
 int queryCurrentNoOfEmpRecs();
 
-std::string filename = "sample-50-recs.csv";
+std::string filename;  // sample-50-recs.csv
+int datanum;
 
 using namespace std;
 
@@ -43,9 +44,9 @@ int main()
                 break;
 
             case 2:
-            	
-                printHelloWorld();
-                readCSV(filename);
+                //printHelloWorld();
+                getUserInputQ2(filename, datanum);
+                readCSV(filename, datanum);
                 break;
 
             case 3:

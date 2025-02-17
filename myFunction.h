@@ -3,7 +3,8 @@
 #include <string>
 
 void printHelloWorld();
-void readCSV(const std::string &filename);
+void readCSV(const std::string &filename, int datanum);
+void getUserInputQ2(std::string &filename, int &datanum);
 
 #endif
 
