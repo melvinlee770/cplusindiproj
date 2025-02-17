@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Employee.h"
+#include "myFunction.h"
 
 // Global variables
 
@@ -18,6 +19,8 @@ int empDBSize = 0;
 void printWelcomeMsg();
 int printMainMenuOptions();
 int queryCurrentNoOfEmpRecs();
+
+std::string filename = "sample-50-recs.csv";
 
 using namespace std;
 
@@ -40,7 +43,9 @@ int main()
                 break;
 
             case 2:
-                cout << "Design your own function(s) to handle: Read Data From File and Populate Employee DB!" << endl;
+            	
+                printHelloWorld();
+                readCSV(filename);
                 break;
 
             case 3:
@@ -99,7 +104,8 @@ void printWelcomeMsg() {
     cout << "\n------------------------------------------------------" << endl;
     cout << "- Welcome to Mr Tian's Assn p2 Sample (Ref) Program! -" << endl;
     cout << "------------------------------------------------------" << endl;
-    cout << endl;
+    cout << "- Student Number: <2400823>"<<endl;
+    cout << "- Student Name: <Lee Yong Zun>"<<endl;
 }
 
 // Function to print the main menu and get user input
