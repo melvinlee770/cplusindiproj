@@ -5,24 +5,63 @@
 #include <vector>
 #include <string>
 #include <regex>
+#include <limits> 
+
+std::string trim(const std::string &str) {
+    size_t first = str.find_first_not_of(" \t\n\r");
+    size_t last = str.find_last_not_of(" \t\n\r");
+    return (first == std::string::npos) ? "" : str.substr(first, (last - first + 1));
+}
+
+std::string validateInput(const std::string &prompt, const std::regex &pattern, const std::string &errorMessage) {
+    std::string input;
+    bool firstAttempt = true;
+    while (true) {
+        std::cout << prompt;
+        std::cin.clear(); 
+        
+        if (std::cin.peek() == '\n' && firstAttempt) {  
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            //std::cout << "marking a"<<std::endl;
+            firstAttempt = false;
+        }
+        
+        getline(std::cin, input);
+        input = trim(input);
+        
+        if (input.empty()) {
+            std::cout << "Error: Input cannot be empty.\n";
+            continue;
+        }
+
+        if (regex_match(input, pattern)) {
+        	//std::cout << "marking b"<<std::endl;
+        	firstAttempt = true;
+            return input; // Valid input
+        } else {
+            std::cout << errorMessage << std::endl;
+        }
+    }
+}
 
 void printHelloWorld() {	// for testing the linking of the file
     std::cout << "helloworld" << std::endl;
 }
 
 void getUserInputQ2(std::string &filename, int &datanum){
-    std::cout << "Enter the CSV filename: ";
-    std::cin >> filename;
 
-    std::cout << "Enter the number of rows to display: ";
-    std::cin >> datanum;
-    std::cout<<std::endl;
+    std::regex filenamePattern(R"(^\S[\w\s-]*\.csv$)");
+ 	std::regex numberPattern(R"(^[1-9][0-9]*$)");
 
-    // Ensure displayLimit is positive
-    if (datanum <= 0) {
-        std::cout << "Invalid input! Setting display limit to 1.\n";
-        datanum = 1;
-    }
+    
+    filename = validateInput("Enter the CSV filename (e.g. data.csv): ", 
+    						filenamePattern, 
+    						"INPUT_ERROR");
+
+    std::string tmpdatanum = validateInput("Enter the number of rows to display (positive integer): ", 
+                                  numberPattern, 
+                                  "INPUT_ERROR");
+   datanum = stoi(tmpdatanum);
 }
 
 void readCSV(const std::string &filename, int datanum) {
@@ -59,3 +98,5 @@ void readCSV(const std::string &filename, int datanum) {
 
     file.close();
 }
+
+
