@@ -20,15 +20,18 @@ void printWelcomeMsg();
 int printMainMenuOptions();
 int queryCurrentNoOfEmpRecs();
 
+int userEnteredNumber;
+std::string filename;
+int datanum;
+
+
+
 using namespace std;
 
 int main() 
 {
     printWelcomeMsg();
-
-    int userEnteredNumber;
-    std::string filename;
-	int datanum;
+    std::vector<std::vector<std::string>> data;
 
     do 
     {
@@ -44,13 +47,14 @@ int main()
 
             case 2:
                 //printHelloWorld();
-                filename = getUserInputQ1();
-                datanum = std::stoi(getUserInputQ2());
-                readCSV(filename, datanum);
+                //filename = getUserInputQ1();
+                //datanum = std::stoi(getUserInputQ2());
+                //empDBSize = datanum;
+                readCSV("sample-50-recs.csv", 21, data);
                 break;
 
             case 3:
-                cout << "Design your own function(s) to handle: Display All Records!" << endl;
+                printStoredData(data);
                 break;
 
             case 4:
@@ -137,7 +141,6 @@ int printMainMenuOptions() {
 int queryCurrentNoOfEmpRecs () 
 {
   return (empDBSize);
-
 }   // end queryCurrentNoOfEmpRecs () ...
 
 
