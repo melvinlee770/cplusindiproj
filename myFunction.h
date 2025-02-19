@@ -3,17 +3,29 @@
 #include <string>
 #include <regex>
 #include <vector>
+#include <unordered_map>
+#include <iostream>
 
-//extern std::vector<std::vector<std::string>> data;
+struct Record {
+    int Idx;
+    std::string Name;
+    std::string Email;
+    std::string IC;
+    std::string PhoneNum;
+    std::string HireDate;
+    std::string BirthDate;
+};
+
 
 bool validateRegex(const std::string& input, const std::string& pattern);
 
 void printHelloWorld();
-void readCSV(const std::string &filename, int datanum, std::vector<std::vector<std::string>> &data);
+
+void loadCSV(const std::string &filename, std::vector<Record> &records, int limit);
+void displayRecords(const std::vector<Record> &records);
+             
 std::string getUserInputQ1();
 std::string getUserInputQ2();
-
-void printStoredData(const std::vector<std::vector<std::string>> &data);
 
 #endif
 

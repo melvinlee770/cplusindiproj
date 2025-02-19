@@ -1,4 +1,6 @@
 #include <iostream>
+#include <unordered_map>
+#include <vector>
 #include "Employee.h"
 #include "myFunction.h"
 
@@ -21,17 +23,17 @@ int printMainMenuOptions();
 int queryCurrentNoOfEmpRecs();
 
 int userEnteredNumber;
+
 std::string filename;
 int datanum;
-
-
 
 using namespace std;
 
 int main() 
 {
     printWelcomeMsg();
-    std::vector<std::vector<std::string>> data;
+    //std::vector<std::unordered_map<std::string, std::string>> data;
+    std::vector<Record> records;
 
     do 
     {
@@ -47,14 +49,14 @@ int main()
 
             case 2:
                 //printHelloWorld();
-                //filename = getUserInputQ1();
-                //datanum = std::stoi(getUserInputQ2());
-                //empDBSize = datanum;
-                readCSV("sample-50-recs.csv", 21, data);
+                filename = getUserInputQ1();
+                datanum = std::stoi(getUserInputQ2());
+                empDBSize = datanum;
+                loadCSV(filename, records, datanum); //"sample-50-recs.csv"
                 break;
 
             case 3:
-                printStoredData(data);
+                displayRecords(records);
                 break;
 
             case 4:

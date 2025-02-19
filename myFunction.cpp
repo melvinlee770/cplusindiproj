@@ -7,7 +7,15 @@
 #include <limits>
 #include <regex> 	
 
-std::vector<std::string> row;
+struct Record {
+    int Idx;
+    std::string Name;
+    std::string Email;
+    std::string IC;
+    std::string PhoneNum;
+    std::string HireDate;
+    std::string BirthDate;
+};
 
 void printHelloWorld() {	// for testing the linking of the file
     std::cout << "helloworld" << std::endl;
@@ -60,67 +68,52 @@ std::string getUserInputQ2() {
     return tmpdatanum;
 }
 
-void readCSV(const std::string &filename, int datanum, std::vector<std::vector<std::string>> &data) {
-	 std::ifstream file(filename);
-	 if (!file.is_open()) {
-        std::cerr << "Error: Unable to open file " << filename << std::endl;
+void loadCSV(const std::string &filename, std::vector<Record> &records, int limit) {
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Error opening file." << std::endl;
         return;
     }
     
     std::string line;
-    int rowCount = 0;
-    int columnCount = 0;
+    std::getline(file, line); // Skip header
     
-    
-   while (std::getline(file, line)) {
-        std::stringstream ss;
-        ss.str(line);  // Set the stringstream to process the current line
-        std::string cell;
-        std::vector<std::string> row;
-
-        if (rowCount == 0) {  // Count columns from the first row
-            while (std::getline(ss, cell, ',')) {
-                columnCount++;
-            }
-            std::cout << "The CSV file has " << columnCount << " columns." << std::endl;
-
-            // Reset the stringstream to reprocess the first row
-            ss.clear();
-            ss.str(line);
-        }
-
-        // Read and store the row data
-        while (std::getline(ss, cell, ',')) {
-            //std::cout << cell;
-            row.push_back(cell);
-        }
-        std::cout << std::endl;
+    int count = 0;
+    while (std::getline(file, line) && count < limit) {
+        std::stringstream ss(line);
+        Record record;
+        std::string field;
         
-        if (row.size() == 7) {  // Ensure it contains exactly 7 elements
-            data.push_back(row);
-        } else {
-            std::cerr << "Warning: Row does not have exactly 7 columns. Skipping." << std::endl;
-        }
+        std::getline(ss, field, ',');
+        record.Idx = std::stoi(field);
+        
+        std::getline(ss, record.Name, ',');
+        std::getline(ss, record.Email, ',');
+        std::getline(ss, record.IC, ',');
+        std::getline(ss, record.PhoneNum, ',');
+        std::getline(ss, record.HireDate, ',');
+        std::getline(ss, record.BirthDate, ',');
 
-        rowCount++;
-
-        if (rowCount >= datanum) {
-            std::cout << "Maximum number of records reached. Ignoring additional data from file '" << filename << "'" << std::endl;
-            std::cout << "Done! Total no. of records read in and stored in DB: " << datanum << std::endl;
-            break;
+        if (count+1 == limit) { 
+        	std::cout << "\nMaximum number of records reached. Ignoring addtional data from file "<< filename<<std::endl;
+            std::cout << "Done! Total no. of records read in and stored in DB " << limit<< std::endl;
         }
+        
+        records.push_back(record);
+        count++;
     }
-
     file.close();
 }
 
-
-void printStoredData(const std::vector<std::vector<std::string>> &data) {	// function print all the data
-    std::cout << "\nStored Data (Structured Array):" << std::endl;
-    for (const auto &record : data) {
-        for (const auto &value : record) {
-            std::cout << value;
-        }
-        std::cout << std::endl;
+void displayRecords(const std::vector<Record> &records) {
+	
+    for (const auto &rec : records) {
+        std::cout << "Idx: " << rec.Idx << ", Name: " << rec.Name 
+                  << ", Email: " << rec.Email << ", IC: " << rec.IC
+                  << ", Phone: " << rec.PhoneNum
+                  << ", HireDate: " << rec.HireDate
+                  << ", BirthDate: " << rec.BirthDate << std::endl;
     }
 }
+
+
