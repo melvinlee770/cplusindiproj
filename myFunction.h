@@ -17,7 +17,7 @@ struct Record {
 };
 
 
-bool validateRegex(const std::string& input, const std::string& pattern);
+extern bool validateRegex(const std::string& input, const std::string& pattern);
 
 void printHelloWorld();
 

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <vector>
+#include <limits>
 #include "Employee.h"
 #include "myFunction.h"
 
@@ -135,10 +136,23 @@ int printMainMenuOptions() {
     cout << endl;
 
     int userEnteredNumber;
-    cout << "Please enter your choice (1 - 12): ";
-    cin >> userEnteredNumber;
+	std::string tmpUserEnteredNumber;
+	//std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	do {
+        std::cout <<"Please enter your choice (1 - 12): "; // testing asnwer: sample-50-recs.csv
+        std::getline(std::cin, tmpUserEnteredNumber); 
+		
+        if (tmpUserEnteredNumber.empty()) {
+            std::cout << "Error: Filename cannot be empty. Please enter a valid number.\n";
+            continue;
+        }
+		break;
+    } while (true); // Repeat until a valid filename is entered
+	userEnteredNumber = std::stoi(tmpUserEnteredNumber);
 
     return (userEnteredNumber);
+    
+
 }
 
 int queryCurrentNoOfEmpRecs () 

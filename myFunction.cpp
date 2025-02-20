@@ -129,41 +129,74 @@ void displayRecords(const std::vector<Record> &records) {
     	std::cout << "No data captured !"<<std::endl;
     	return;
     }
-	/*
-    for (const auto &rec : records) {
-    	
-        std::cout << "Idx: " << rec.Idx << ", Name: " << rec.Name 
-                  << ", Email: " << rec.Email << ", IC: " << rec.IC
-                  << ", Phone: " << rec.PhoneNum
-                  << ", HireDate: " << rec.HireDate
-                  << ", BirthDate: " << rec.BirthDate << std::endl;
-    }
-    */
     
-    std::cout << "-------------------------------------------------------------------------------------------------\n";
-    std::cout << std::left 
-              << std::setw(5)  << "Idx"
-              << std::setw(15) << "IC"
-              << std::setw(25) << "Name"
-              << std::setw(15) << "Phone"
-              << std::setw(15) << "Birth Date"
-              << std::setw(15) << "Hired Date"
-              << "Email" 
-              << std::endl;
-	std::cout << "-------------------------------------------------------------------------------------------------\n";
-	std::cout<<std::endl;
+	std::string tmpIndex;
+	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	do {
+        std::cout << "Show array index? (y/n): "; // testing asnwer: sample-50-recs.csv
+        std::getline(std::cin, tmpIndex); 
+		
+        if (tmpIndex.empty()) {
+            std::cout << "Error: Filename cannot be empty. Please enter a valid filename.\n";
+            continue;
+        }
+        else if (!validateRegex(tmpIndex, "^[ynYN]$")) {
+            std::cout << "INPUT_ERROR\n";
+            continue;
+        }
+		break;
+    } while (true); // Repeat until a valid filename is entered
+
+	if(tmpIndex == "y" || tmpIndex == "Y") {
+		std::cout << "======================================================================================================================\n";
+   		std::cout << std::left 
+        << std::setw(8)  << "Idx"
+		<< std::setw(11) << "IC"
+        << std::setw(36) << "Name"
+        << std::setw(16) << "Phone"
+        << std::setw(16) << "Birth Date"
+        << std::setw(16) << "Hired Date"
+        << "Email" 
+        << std::endl;
+		std::cout << "======================================================================================================================\n";
+		std::cout<<std::endl;
 	
-	for (const auto &rec : records) {
-        std::cout << std::left
-                  << std::setw(5)  << rec.Idx
-                  << std::setw(15) << rec.IC
-                  << std::setw(25) << rec.Name
-                  << std::setw(15) << rec.PhoneNum
-                  << std::setw(15) << rec.BirthDate
-                  << std::setw(15) << rec.HireDate
-                  << rec.Email  // The last column can be printed without setw if you prefer
-                  << std::endl;
-    }
+		for (const auto &rec : records) {
+        	std::cout << std::left
+            << std::setw(8)  << rec.Idx
+            << std::setw(11) << rec.IC
+        	<< std::setw(36) << rec.Name
+            << std::setw(16) << rec.PhoneNum
+            << std::setw(16) << rec.BirthDate
+            << std::setw(16) << rec.HireDate
+            << rec.Email  // The last column can be printed without setw if you prefer
+            << std::endl;
+    	}
+	}
+	else if (tmpIndex == "n"|| tmpIndex == "N") {
+		std::cout << "======================================================================================================================\n";
+   		std::cout << std::left 
+		<< std::setw(11) << "IC"
+        << std::setw(36) << "Name"
+        << std::setw(16) << "Phone"
+        << std::setw(16) << "Birth Date"
+        << std::setw(16) << "Hired Date"
+        << "Email" 
+        << std::endl;
+		std::cout << "======================================================================================================================\n";
+		std::cout<<std::endl;
+	
+		for (const auto &rec : records) {
+        	std::cout << std::left
+            << std::setw(11) << rec.IC
+        	<< std::setw(36) << rec.Name
+            << std::setw(16) << rec.PhoneNum
+            << std::setw(16) << rec.BirthDate
+            << std::setw(16) << rec.HireDate
+            << rec.Email  // The last column can be printed without setw if you prefer
+            << std::endl;
+    	}
+	}
 }
 
 
