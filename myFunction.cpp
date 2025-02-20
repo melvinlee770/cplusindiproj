@@ -1,11 +1,11 @@
 #include <iostream>
-#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <vector>
 #include <string>
 #include <limits>
 #include <regex> 	
+#include <iomanip>
 
 struct Record {
     int Idx;
@@ -68,6 +68,22 @@ std::string getUserInputQ2() {
     return tmpdatanum;
 }
 
+std::string formatDate(const std::string &date) {
+    std::stringstream ss(date);
+    int day, month, year;
+    char delimiter1, delimiter2;
+    
+    if (!(ss >> month >> delimiter1 >> day >> delimiter2 >> year)) {
+        return date; // Return original if parsing fails
+    }
+    
+    std::ostringstream formattedDate;
+    formattedDate << std::setw(2) << std::setfill('0') << month << "/"
+                  << std::setw(2) << std::setfill('0') << day << "/"
+                  << year;
+    return formattedDate.str();
+}
+
 void loadCSV(const std::string &filename, std::vector<Record> &records, int limit) {
     std::ifstream file(filename);
     if (!file.is_open()) {
@@ -92,7 +108,9 @@ void loadCSV(const std::string &filename, std::vector<Record> &records, int limi
         std::getline(ss, record.IC, ',');
         std::getline(ss, record.PhoneNum, ',');
         std::getline(ss, record.HireDate, ',');
+        record.HireDate = formatDate(record.HireDate);
         std::getline(ss, record.BirthDate, ',');
+        record.BirthDate = formatDate(record.BirthDate);
 
         if (count+1 == limit) { 
         	std::cout << "\nMaximum number of records reached. Ignoring addtional data from file "<< filename<<std::endl;
@@ -106,13 +124,45 @@ void loadCSV(const std::string &filename, std::vector<Record> &records, int limi
 }
 
 void displayRecords(const std::vector<Record> &records) {
-	
+
+    if (records.empty()) {
+    	std::cout << "No data captured !"<<std::endl;
+    	return;
+    }
+	/*
     for (const auto &rec : records) {
+    	
         std::cout << "Idx: " << rec.Idx << ", Name: " << rec.Name 
                   << ", Email: " << rec.Email << ", IC: " << rec.IC
                   << ", Phone: " << rec.PhoneNum
                   << ", HireDate: " << rec.HireDate
                   << ", BirthDate: " << rec.BirthDate << std::endl;
+    }
+    */
+    
+    std::cout << "-------------------------------------------------------------------------------------------------\n";
+    std::cout << std::left 
+              << std::setw(5)  << "Idx"
+              << std::setw(15) << "IC"
+              << std::setw(25) << "Name"
+              << std::setw(15) << "Phone"
+              << std::setw(15) << "Birth Date"
+              << std::setw(15) << "Hired Date"
+              << "Email" 
+              << std::endl;
+	std::cout << "-------------------------------------------------------------------------------------------------\n";
+	std::cout<<std::endl;
+	
+	for (const auto &rec : records) {
+        std::cout << std::left
+                  << std::setw(5)  << rec.Idx
+                  << std::setw(15) << rec.IC
+                  << std::setw(25) << rec.Name
+                  << std::setw(15) << rec.PhoneNum
+                  << std::setw(15) << rec.BirthDate
+                  << std::setw(15) << rec.HireDate
+                  << rec.Email  // The last column can be printed without setw if you prefer
+                  << std::endl;
     }
 }
 

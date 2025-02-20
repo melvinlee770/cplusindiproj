@@ -23,6 +23,7 @@ void printHelloWorld();
 
 void loadCSV(const std::string &filename, std::vector<Record> &records, int limit);
 void displayRecords(const std::vector<Record> &records);
+std::string formatDate(const std::string &date);
              
 std::string getUserInputQ1();
 std::string getUserInputQ2();

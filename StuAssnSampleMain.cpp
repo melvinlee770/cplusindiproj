@@ -49,10 +49,11 @@ int main()
 
             case 2:
                 //printHelloWorld();
-                filename = getUserInputQ1();
-                datanum = std::stoi(getUserInputQ2());
-                empDBSize = datanum;
-                loadCSV(filename, records, datanum); //"sample-50-recs.csv"
+                //filename = getUserInputQ1();
+                //datanum = std::stoi(getUserInputQ2());
+                //empDBSize = datanum;
+                //loadCSV(filename, records, datanum); //"sample-50-recs.csv"
+                loadCSV("sample-50-recs.csv", records, 20); //"sample-50-recs.csv"
                 break;
 
             case 3:
