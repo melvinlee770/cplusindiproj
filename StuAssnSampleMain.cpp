@@ -146,6 +146,11 @@ int printMainMenuOptions() {
             std::cout << "Error: Filename cannot be empty. Please enter a valid number.\n";
             continue;
         }
+        
+       if (!validateRegex(tmpUserEnteredNumber, R"(^[1-9]|1[0-2]$)")) {
+            std::cout << "INPUT_ERROR\n";
+            continue;
+        }
 		break;
     } while (true); // Repeat until a valid filename is entered
 	userEnteredNumber = std::stoi(tmpUserEnteredNumber);

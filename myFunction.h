@@ -1,4 +1,4 @@
-#ifndef MY_FUNCTiON_H
+#ifndef MY_FUNCTION_H
 #define MY_FUCNTION_H
 #include <string>
 #include <regex>
@@ -17,7 +17,7 @@ struct Record {
 };
 
 
-extern bool validateRegex(const std::string& input, const std::string& pattern);
+bool validateRegex(const std::string& input, const std::string& pattern);
 
 void printHelloWorld();
 

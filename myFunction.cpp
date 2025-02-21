@@ -21,7 +21,7 @@ void printHelloWorld() {	// for testing the linking of the file
     std::cout << "helloworld" << std::endl;
 }
 
-bool validateRegex(const std::string& input, const std::string pattern) {
+bool validateRegex(const std::string& input, const std::string& pattern) {
     std::regex regexPattern(pattern);
     return std::regex_match(input, regexPattern);
 }
@@ -131,7 +131,7 @@ void displayRecords(const std::vector<Record> &records) {
     }
     
 	std::string tmpIndex;
-	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	//std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	do {
         std::cout << "Show array index? (y/n): "; // testing asnwer: sample-50-recs.csv
         std::getline(std::cin, tmpIndex); 
