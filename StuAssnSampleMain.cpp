@@ -66,7 +66,7 @@ int main()
             case 4:
             	do {
             		userEnteredICTask = pirntSearchICMenu();
-                	searchICTask(userEnteredICTask);
+                	searchICTask(userEnteredICTask, records);
             	}while (userEnteredICTask != 4);
             	break;
 
@@ -178,7 +178,7 @@ int pirntSearchICMenu() {
 		cout << "\n-----------------------------------------------------" << endl;
         std::cout << "\n1) Enter an ic					(current value = '"<< UserInputIC<<"')"<<std::endl;
         std::cout << "2) Search for employee IC = '"<<UserInputIC<<"' 		(i.e. EXACT MATCH) "<<std::endl; 
-        std::cout << "3) Search for employee IC containing = '"<<UserInputIC<"'	(i.e. PARTIAL MATCH) "<<std::endl; 
+        std::cout << "3) Search for employee IC containing = '"<<UserInputIC<<"'	(i.e. PARTIAL MATCH) "<<std::endl; 
         std::cout << "4) Back to main menu ..."<<std::endl;
         cout << "\n-----------------------------------------------------" << endl;
 

@@ -221,10 +221,31 @@ std::string getUserInputIC() {
     return tmpUserInputIC;
 }
 
-void searchICTask(int userinput) {
+
+void ICExactFound(const std::vector<Record> &records) {
+
+std::cout << UserInputIC;
+    for (const auto &rec : records) {
+    	std::cout<<rec.IC;
+            if (rec.IC == UserInputIC) {
+                std::cout << "Exact match found:\n";
+                std::cout << "Idx: " << rec.Idx << ", Name: " << rec.Name 
+                          << ", Email: " << rec.Email << ", IC: " << rec.IC 
+                          << ", Phone: " << rec.PhoneNum << std::endl;
+				break;
+            }
+		
+	}	
+} 
+
+void searchICTask(int userinput, const std::vector<Record> &records) {
 	switch (userinput) {
 		case 1:
 			UserInputIC = getUserInputIC();
+			break;
+		case 2:
+			std::cout << "helloworld\n";
+			ICExactFound(records);
 			break;
 		case 4:
 			break;
@@ -233,4 +254,6 @@ void searchICTask(int userinput) {
             break;
 	}
 }
+
+
 
