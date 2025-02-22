@@ -22,8 +22,10 @@ int empDBSize = 0;
 void printWelcomeMsg();
 int printMainMenuOptions();
 int queryCurrentNoOfEmpRecs();
+int pirntSearchICMenu();
 
 int userEnteredNumber;
+int userEnteredICTask;
 
 std::string filename;
 int datanum;
@@ -62,8 +64,11 @@ int main()
                 break;
 
             case 4:
-                cout << "Design your own function(s) to handle: Search for records by IC!" << endl;
-                break;
+            	do {
+            		userEnteredICTask = pirntSearchICMenu();
+                	searchICTask(userEnteredICTask);
+            	}while (userEnteredICTask != 4);
+            	break;
 
             case 5:
                 cout << "Design your own function(s) to handle: Search for records by Name!" << endl;
@@ -143,11 +148,11 @@ int printMainMenuOptions() {
         std::getline(std::cin, tmpUserEnteredNumber); 
 		
         if (tmpUserEnteredNumber.empty()) {
-            std::cout << "Error: Filename cannot be empty. Please enter a valid number.\n";
+            std::cout << "Error: Input cannot be empty. Please enter a valid number.\n";
             continue;
         }
         
-       if (!validateRegex(tmpUserEnteredNumber, R"(^[1-9]|1[0-2]$)")) {
+       else if (!validateRegex(tmpUserEnteredNumber, R"(^[1-9]|1[0-2]$)")) {
             std::cout << "INPUT_ERROR\n";
             continue;
         }
@@ -165,4 +170,32 @@ int queryCurrentNoOfEmpRecs ()
   return (empDBSize);
 }   // end queryCurrentNoOfEmpRecs () ...
 
+int pirntSearchICMenu() {
+	std::string tmpUserEnteredNumberICMenu;
+	int UserEnteredNumberICMenu;
+	//std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	do {
+		cout << "\n-----------------------------------------------------" << endl;
+        std::cout << "\n1) Enter an ic					(current value = '"<< UserInputIC<<"')"<<std::endl;
+        std::cout << "2) Search for employee IC = '"<<UserInputIC<<"' 		(i.e. EXACT MATCH) "<<std::endl; 
+        std::cout << "3) Search for employee IC containing = '"<<UserInputIC<"'	(i.e. PARTIAL MATCH) "<<std::endl; 
+        std::cout << "4) Back to main menu ..."<<std::endl;
+        cout << "\n-----------------------------------------------------" << endl;
+
+		std::cout <<"Please enter your choice (1-4): ";
+        std::getline(std::cin, tmpUserEnteredNumberICMenu); 
+		
+        if (tmpUserEnteredNumberICMenu.empty()) {
+            std::cout << "Error: Input cannot be empty. Please enter a valid number.\n";
+            continue;
+        }
+        else if (!validateRegex(tmpUserEnteredNumberICMenu, R"(^[1-4]$)")) {
+            std::cout << "INPUT_ERROR\n";
+            continue;
+        }
+		break;
+    } while (true); 
+    UserEnteredNumberICMenu = std::stoi(tmpUserEnteredNumberICMenu);
+    return UserEnteredNumberICMenu;
+}
 

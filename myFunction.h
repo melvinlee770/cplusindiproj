@@ -6,6 +6,8 @@
 #include <unordered_map>
 #include <iostream>
 
+extern std::string UserInputIC;
+
 struct Record {
     int Idx;
     std::string Name;
@@ -15,7 +17,6 @@ struct Record {
     std::string HireDate;
     std::string BirthDate;
 };
-
 
 bool validateRegex(const std::string& input, const std::string& pattern);
 
@@ -27,6 +28,9 @@ std::string formatDate(const std::string &date);
              
 std::string getUserInputQ1();
 std::string getUserInputQ2();
+
+void searchICTask(int userinput);
+std::string getUserInputIC();
 
 #endif
 

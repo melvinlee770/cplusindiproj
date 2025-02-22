@@ -7,6 +7,8 @@
 #include <regex> 	
 #include <iomanip>
 
+std::string UserInputIC = "00";
+
 struct Record {
     int Idx;
     std::string Name;
@@ -199,4 +201,36 @@ void displayRecords(const std::vector<Record> &records) {
 	}
 }
 
+std::string getUserInputIC() {
+	std::string tmpUserInputIC;
+	//std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	do {
+        std::cout << "Please type in ic value to search for (< 10 chars) : "; // testing asnwer: sample-50-recs.csv
+        std::getline(std::cin, tmpUserInputIC); 
+		
+        if (tmpUserInputIC.empty()) {
+            std::cout << "Error: Input cannot be empty. Please enter a valid ic.\n";
+            continue;
+        }
+        else if (!validateRegex(tmpUserInputIC, R"(^.{1,9}$)")) {
+            std::cout << "Input too long. Please enter data again ( < 10 chars) : \n";
+            continue;
+        }
+		break;
+    } while (true); // Repeat until a valid filename is entered
+    return tmpUserInputIC;
+}
+
+void searchICTask(int userinput) {
+	switch (userinput) {
+		case 1:
+			UserInputIC = getUserInputIC();
+			break;
+		case 4:
+			break;
+		 default:
+            std::cout << "Invalid choice. Please try again.\n";
+            break;
+	}
+}
 
