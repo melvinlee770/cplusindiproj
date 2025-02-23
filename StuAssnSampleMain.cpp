@@ -23,9 +23,11 @@ void printWelcomeMsg();
 int printMainMenuOptions();
 int queryCurrentNoOfEmpRecs();
 int pirntSearchICMenu();
+int printSearchNameMenu();
 
 int userEnteredNumber;
 int userEnteredICTask;
+int userEneteredNameTask;
 
 std::string filename;
 int datanum;
@@ -71,8 +73,11 @@ int main()
             	break;
 
             case 5:
-                cout << "Design your own function(s) to handle: Search for records by Name!" << endl;
-                break;
+            	do {
+            		userEneteredNameTask = printSearchNameMenu();
+            		searchNameTask(userEneteredNameTask , records);
+            	}while (userEneteredNameTask != 4);
+            	break;
 
             case 6:
                 cout << "Design your own function(s) to handle: Search for records by Email!" << endl;
@@ -170,6 +175,7 @@ int queryCurrentNoOfEmpRecs ()
   return (empDBSize);
 }   // end queryCurrentNoOfEmpRecs () ...
 
+
 int pirntSearchICMenu() {
 	std::string tmpUserEnteredNumberICMenu;
 	int UserEnteredNumberICMenu;
@@ -197,5 +203,36 @@ int pirntSearchICMenu() {
     } while (true); 
     UserEnteredNumberICMenu = std::stoi(tmpUserEnteredNumberICMenu);
     return UserEnteredNumberICMenu;
+}
+
+
+int printSearchNameMenu() {
+	std::string tmpUserEnteredNumberNameMenu;
+	int UserEnteredNumberNameMenu;
+	//std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	do {
+		cout << "\n-----------------------------------------------------" << endl;
+        std::cout << "\n1) Enter a name						(current value = '"<< userInputName<<"')"<<std::endl;
+        std::cout << "2) Search for employee name = '"<<userInputName<<"' 		(i.e. EXACT MATCH) "<<std::endl; 
+        std::cout << "3) Search for employee name containing = '"<<userInputName<<"'	(i.e. PARTIAL MATCH) "<<std::endl; 
+        std::cout << "4) Back to main menu ..."<<std::endl;
+        cout << "\n-----------------------------------------------------" << endl;
+
+		std::cout <<"Please enter your choice (1-4): ";
+        std::getline(std::cin, tmpUserEnteredNumberNameMenu); 
+		
+        if (tmpUserEnteredNumberNameMenu.empty()) {
+            std::cout << "Error: Input cannot be empty. Please enter a valid name.\n";
+            continue;
+        }
+        else if (!validateRegex(tmpUserEnteredNumberNameMenu, R"(^[1-4]$)")) {
+            std::cout << "INPUT_ERROR\n";
+            continue;
+        }
+		break;
+		
+    } while (true); 
+    UserEnteredNumberNameMenu = std::stoi(tmpUserEnteredNumberNameMenu);
+    return UserEnteredNumberNameMenu;
 }
 

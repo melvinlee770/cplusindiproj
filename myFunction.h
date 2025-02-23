@@ -7,6 +7,7 @@
 #include <iostream>
 
 extern std::string UserInputIC;
+extern std::string userInputName;
 
 struct Record {
     int Idx;
@@ -33,6 +34,9 @@ void searchICTask(int userinput, const std::vector<Record> &records);
 std::string getUserInputIC();
 void ICExactFound(const std::vector<Record> &records);
 void ICPartialFound(const std::vector<Record> &records);
+
+void searchNameTask(int userinput, const std::vector<Record> &records);
+void NameExactFound(const std::vector<Record> &records);
 
 #endif
 

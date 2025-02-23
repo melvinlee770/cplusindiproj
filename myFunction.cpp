@@ -8,6 +8,7 @@
 #include <iomanip>
 
 std::string UserInputIC = "00";
+std::string userInputName = "SAMPLE_NAME";
 
 struct Record {
     int Idx;
@@ -252,11 +253,10 @@ void ICExactFound(const std::vector<Record> &records) {
                       << std::endl;
             found = true;
             }
-    	if (!found) {
-        	std::cout << "No record found with IC: " << UserInputIC << std::endl;
-        	break;
-    	}
-	}	
+		}	
+	if (!found) {
+		std::cout << "No record found with IC: " << UserInputIC << std::endl;
+	}
 } 
 
 void ICPartialFound(const std::vector<Record> &records) {
@@ -292,7 +292,7 @@ void ICPartialFound(const std::vector<Record> &records) {
 	if (!found) {
 		std::cout << "No record found with IC: " << UserInputIC << std::endl;
     }
-} 
+}       
 
 void searchICTask(int userinput, const std::vector<Record> &records) {
 	switch (userinput) {
@@ -300,11 +300,11 @@ void searchICTask(int userinput, const std::vector<Record> &records) {
 			UserInputIC = getUserInputIC();
 			break;
 		case 2:
-			//std::cout << "helloworld\n";
 			ICExactFound(records);
 			break;
 		case 3:
 			ICPartialFound(records);
+			break;
 		case 4:
 			break;
 		 default:
@@ -313,5 +313,115 @@ void searchICTask(int userinput, const std::vector<Record> &records) {
 	}
 }
 
+std::string getUserInputName() {
+	std::string tmpUserInputName;
+	//std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	do {
+        std::cout << "Please type in name value to search for (< 35 chars) : "; // testing asnwer: sample-50-recs.csv
+        std::getline(std::cin, tmpUserInputName); 
+		
+        if (tmpUserInputName.empty()) {
+            std::cout << "Error: Input cannot be empty. Please enter a valid name.\n";
+            continue;
+        }
+        else if (!validateRegex(tmpUserInputName, R"(^(?=.{1,35}$)[A-Za-z\s'-]+$)"
+)) {
+            std::cout << "Input too long. Please enter data again ( < 35 chars) : \n";
+            continue;
+        }
+		break;
+    } while (true); // Repeat until a valid filename is entered
+    return tmpUserInputName;
+}
 
+
+void NameExactFound(const std::vector<Record> &records) {
+	bool found = false;
+    for (const auto &rec : records) {
+		if (rec.Name == userInputName ) {
+			if (!found) {
+                std::cout << "======================================================================================================================\n";
+                std::cout << std::left 
+                          << std::setw(8)  << "Idx"
+                          << std::setw(11) << "IC"
+                          << std::setw(36) << "Name"
+                          << std::setw(16) << "Phone"
+                          << std::setw(16) << "Birth Date"
+                          << std::setw(16) << "Hired Date"
+                          << "Email" 
+                          << std::endl;
+                std::cout << "======================================================================================================================\n";
+            }
+            std::cout << std::left
+                      << std::setw(8)  << rec.Idx
+                      << std::setw(11) << rec.IC
+                      << std::setw(36) << rec.Name
+                      << std::setw(16) << rec.PhoneNum
+                      << std::setw(16) << rec.BirthDate
+                      << std::setw(16) << rec.HireDate
+                      << rec.Email
+                      << std::endl;
+            found = true;
+            }
+	}	
+	if (!found) {
+		std::cout << "No record found with IC: " << userInputName << std::endl;
+   	}
+} 
+
+
+void NamePartialFound(const std::vector<Record> &records) {
+	bool found = false;
+    for (const auto &rec : records) {
+    	//std::cout<<rec.IC;
+		if (rec.Name.find(userInputName) != std::string::npos) {
+			if (!found) {
+                std::cout << "======================================================================================================================\n";
+                std::cout << std::left 
+                          << std::setw(8)  << "Idx"
+                          << std::setw(11) << "IC"
+                          << std::setw(36) << "Name"
+                          << std::setw(16) << "Phone"
+                          << std::setw(16) << "Birth Date"
+                          << std::setw(16) << "Hired Date"
+                          << "Email" 
+                          << std::endl;
+                std::cout << "======================================================================================================================\n";
+            }
+            std::cout << std::left
+                      << std::setw(8)  << rec.Idx
+                      << std::setw(11) << rec.IC
+                      << std::setw(36) << rec.Name
+                      << std::setw(16) << rec.PhoneNum
+                      << std::setw(16) << rec.BirthDate
+                      << std::setw(16) << rec.HireDate
+                      << rec.Email
+                      << std::endl;
+            found = true;
+            }
+	}	
+	if (!found) {
+		std::cout << "No record found with name: " << userInputName << std::endl;
+    }
+}
+
+
+void searchNameTask(int userinput, const std::vector<Record> &records) {
+	switch (userinput) {
+		case 1:
+			userInputName = getUserInputName();
+			break;
+		case 2:
+			NameExactFound(records);
+			break;
+		case 3:
+			NamePartialFound(records);
+			break;
+		case 4:
+			break;
+		 default:
+            std::cout << "Invalid choice. Please try again.\n";
+            break;
+	}
+}
 
