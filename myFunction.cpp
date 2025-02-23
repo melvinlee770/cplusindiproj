@@ -223,19 +223,75 @@ std::string getUserInputIC() {
 
 
 void ICExactFound(const std::vector<Record> &records) {
-
-std::cout << UserInputIC;
+	bool found = false;
+	//std::cout << UserInputIC;
     for (const auto &rec : records) {
-    	std::cout<<rec.IC;
-            if (rec.IC == UserInputIC) {
-                std::cout << "Exact match found:\n";
-                std::cout << "Idx: " << rec.Idx << ", Name: " << rec.Name 
-                          << ", Email: " << rec.Email << ", IC: " << rec.IC 
-                          << ", Phone: " << rec.PhoneNum << std::endl;
-				break;
+    	//std::cout<<rec.IC;
+		if (rec.IC == UserInputIC) {
+			if (!found) {
+                std::cout << "======================================================================================================================\n";
+                std::cout << std::left 
+                          << std::setw(8)  << "Idx"
+                          << std::setw(11) << "IC"
+                          << std::setw(36) << "Name"
+                          << std::setw(16) << "Phone"
+                          << std::setw(16) << "Birth Date"
+                          << std::setw(16) << "Hired Date"
+                          << "Email" 
+                          << std::endl;
+                std::cout << "======================================================================================================================\n";
             }
-		
+            std::cout << std::left
+                      << std::setw(8)  << rec.Idx
+                      << std::setw(11) << rec.IC
+                      << std::setw(36) << rec.Name
+                      << std::setw(16) << rec.PhoneNum
+                      << std::setw(16) << rec.BirthDate
+                      << std::setw(16) << rec.HireDate
+                      << rec.Email
+                      << std::endl;
+            found = true;
+            }
+    	if (!found) {
+        	std::cout << "No record found with IC: " << UserInputIC << std::endl;
+        	break;
+    	}
 	}	
+} 
+
+void ICPartialFound(const std::vector<Record> &records) {
+	bool found = false;
+    for (const auto &rec : records) {
+    	//std::cout<<rec.IC;
+		if (rec.IC.find(UserInputIC) != std::string::npos) {
+			if (!found) {
+                std::cout << "======================================================================================================================\n";
+                std::cout << std::left 
+                          << std::setw(8)  << "Idx"
+                          << std::setw(11) << "IC"
+                          << std::setw(36) << "Name"
+                          << std::setw(16) << "Phone"
+                          << std::setw(16) << "Birth Date"
+                          << std::setw(16) << "Hired Date"
+                          << "Email" 
+                          << std::endl;
+                std::cout << "======================================================================================================================\n";
+            }
+            std::cout << std::left
+                      << std::setw(8)  << rec.Idx
+                      << std::setw(11) << rec.IC
+                      << std::setw(36) << rec.Name
+                      << std::setw(16) << rec.PhoneNum
+                      << std::setw(16) << rec.BirthDate
+                      << std::setw(16) << rec.HireDate
+                      << rec.Email
+                      << std::endl;
+            found = true;
+            }
+	}	
+	if (!found) {
+		std::cout << "No record found with IC: " << UserInputIC << std::endl;
+    }
 } 
 
 void searchICTask(int userinput, const std::vector<Record> &records) {
@@ -244,9 +300,11 @@ void searchICTask(int userinput, const std::vector<Record> &records) {
 			UserInputIC = getUserInputIC();
 			break;
 		case 2:
-			std::cout << "helloworld\n";
+			//std::cout << "helloworld\n";
 			ICExactFound(records);
 			break;
+		case 3:
+			ICPartialFound(records);
 		case 4:
 			break;
 		 default:

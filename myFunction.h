@@ -32,6 +32,7 @@ std::string getUserInputQ2();
 void searchICTask(int userinput, const std::vector<Record> &records);
 std::string getUserInputIC();
 void ICExactFound(const std::vector<Record> &records);
+void ICPartialFound(const std::vector<Record> &records);
 
 #endif
 
