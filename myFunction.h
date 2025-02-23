@@ -6,8 +6,10 @@
 #include <unordered_map>
 #include <iostream>
 
-extern std::string UserInputIC;
+extern std::string userInputIC;
 extern std::string userInputName;
+extern std::string userInputEmail;
+extern std::string userInputPhone;
 
 struct Record {
     int Idx;
@@ -31,12 +33,9 @@ std::string getUserInputQ1();
 std::string getUserInputQ2();
 
 void searchICTask(int userinput, const std::vector<Record> &records);
-std::string getUserInputIC();
-void ICExactFound(const std::vector<Record> &records);
-void ICPartialFound(const std::vector<Record> &records);
-
 void searchNameTask(int userinput, const std::vector<Record> &records);
-void NameExactFound(const std::vector<Record> &records);
+void searchEmailTask(int userinput, const std::vector<Record> &records);
+void searchPhoneTask(int userinput, const std::vector<Record> &records);
 
 #endif
 

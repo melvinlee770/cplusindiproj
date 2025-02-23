@@ -24,10 +24,14 @@ int printMainMenuOptions();
 int queryCurrentNoOfEmpRecs();
 int pirntSearchICMenu();
 int printSearchNameMenu();
+int printSearchEmailMenu();
+int printSearchPhoneMenu();
 
 int userEnteredNumber;
 int userEnteredICTask;
 int userEneteredNameTask;
+int userEnteredEmailTask;
+int userEnteredPhoneTask;
 
 std::string filename;
 int datanum;
@@ -80,11 +84,17 @@ int main()
             	break;
 
             case 6:
-                cout << "Design your own function(s) to handle: Search for records by Email!" << endl;
+            	do {
+            		userEnteredEmailTask = printSearchEmailMenu();
+            		searchEmailTask(userEnteredEmailTask , records);
+            	}while (userEnteredEmailTask != 4);
                 break;
 
             case 7:
-                cout << "Design your own function(s) to handle: Search for records by Phone Number!" << endl;
+                do {
+            		userEnteredPhoneTask = printSearchPhoneMenu();
+            		searchPhoneTask(userEnteredPhoneTask, records);
+            	}while (userEnteredPhoneTask != 4);
                 break;
 
             case 8:
@@ -182,9 +192,9 @@ int pirntSearchICMenu() {
 	//std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	do {
 		cout << "\n-----------------------------------------------------" << endl;
-        std::cout << "\n1) Enter an ic					(current value = '"<< UserInputIC<<"')"<<std::endl;
-        std::cout << "2) Search for employee IC = '"<<UserInputIC<<"' 		(i.e. EXACT MATCH) "<<std::endl; 
-        std::cout << "3) Search for employee IC containing = '"<<UserInputIC<<"'	(i.e. PARTIAL MATCH) "<<std::endl; 
+        std::cout << "\n1) Enter an ic					(current value = '"<< userInputIC<<"')"<<std::endl;
+        std::cout << "2) Search for employee IC = '"<<userInputIC<<"' 		(i.e. EXACT MATCH) "<<std::endl; 
+        std::cout << "3) Search for employee IC containing = '"<<userInputIC<<"'	(i.e. PARTIAL MATCH) "<<std::endl; 
         std::cout << "4) Back to main menu ..."<<std::endl;
         cout << "\n-----------------------------------------------------" << endl;
 
@@ -192,7 +202,7 @@ int pirntSearchICMenu() {
         std::getline(std::cin, tmpUserEnteredNumberICMenu); 
 		
         if (tmpUserEnteredNumberICMenu.empty()) {
-            std::cout << "Error: Input cannot be empty. Please enter a valid number.\n";
+            std::cout << "Error: Input cannot be empty. Please enter a valid choice.\n";
             continue;
         }
         else if (!validateRegex(tmpUserEnteredNumberICMenu, R"(^[1-4]$)")) {
@@ -222,7 +232,7 @@ int printSearchNameMenu() {
         std::getline(std::cin, tmpUserEnteredNumberNameMenu); 
 		
         if (tmpUserEnteredNumberNameMenu.empty()) {
-            std::cout << "Error: Input cannot be empty. Please enter a valid name.\n";
+            std::cout << "Error: Input cannot be empty. Please enter a valid choice.\n";
             continue;
         }
         else if (!validateRegex(tmpUserEnteredNumberNameMenu, R"(^[1-4]$)")) {
@@ -236,3 +246,64 @@ int printSearchNameMenu() {
     return UserEnteredNumberNameMenu;
 }
 
+
+int printSearchEmailMenu() {
+	std::string tmpUserEnteredNumberEmailMenu;
+	int UserEnteredNumberEmailMenu;
+	//std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	do {
+		cout << "\n-----------------------------------------------------" << endl;
+        std::cout << "\n1) Enter a email						(current value = '"<< userInputEmail<<"')"<<std::endl;
+        std::cout << "2) Search for employee email = '"<<userInputEmail<<"' 			(i.e. EXACT MATCH) "<<std::endl; 
+        std::cout << "3) Search for employee email containing = '"<<userInputEmail<<"'	(i.e. PARTIAL MATCH) "<<std::endl; 
+        std::cout << "4) Back to main menu ..."<<std::endl;
+        cout << "\n-----------------------------------------------------" << endl;
+
+		std::cout <<"Please enter your choice (1-4): ";
+        std::getline(std::cin, tmpUserEnteredNumberEmailMenu); 
+		
+        if (tmpUserEnteredNumberEmailMenu.empty()) {
+            std::cout << "Error: Input cannot be empty. Please enter a valid choice\n";
+            continue;
+        }
+        else if (!validateRegex(tmpUserEnteredNumberEmailMenu, R"(^[1-4]$)")) {
+            std::cout << "INPUT_ERROR\n";
+            continue;
+        }
+		break;
+		
+    } while (true); 
+    UserEnteredNumberEmailMenu = std::stoi(tmpUserEnteredNumberEmailMenu);
+    return UserEnteredNumberEmailMenu;
+}
+
+
+int printSearchPhoneMenu() {
+	std::string tmpUserEnteredNumberPhoneMenu;
+	int UserEnteredNumberPhoneMenu;
+	//std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	do {
+		cout << "\n-----------------------------------------------------" << endl;
+        std::cout << "\n1) Enter a phone number						(current value = '"<< userInputPhone<<"')"<<std::endl;
+        std::cout << "2) Search for employee phone number = '"<<userInputPhone<<"' 			(i.e. EXACT MATCH) "<<std::endl; 
+        std::cout << "3) Search for employee phone number containing = '"<<userInputPhone<<"'	(i.e. PARTIAL MATCH) "<<std::endl; 
+        std::cout << "4) Back to main menu ..."<<std::endl;
+        cout << "\n-----------------------------------------------------" << endl;
+
+		std::cout <<"Please enter your choice (1-4): ";
+        std::getline(std::cin, tmpUserEnteredNumberPhoneMenu); 
+		
+        if (tmpUserEnteredNumberPhoneMenu.empty()) {
+            std::cout << "Error: Input cannot be empty. Please enter a valid choice.\n";
+            continue;
+        }
+        else if (!validateRegex(tmpUserEnteredNumberPhoneMenu, R"(^[1-4]$)")) {
+            std::cout << "INPUT_ERROR\n";
+            continue;
+        }
+		break;
+		
+    } while (true); 
+    UserEnteredNumberPhoneMenu = std::stoi(tmpUserEnteredNumberPhoneMenu);
+    return UserEnteredNumberPhoneMenu;
+}

@@ -7,8 +7,10 @@
 #include <regex> 	
 #include <iomanip>
 
-std::string UserInputIC = "00";
+std::string userInputIC = "00";
 std::string userInputName = "SAMPLE_NAME";
+std::string userInputEmail = "SAMPLE_EMAIL";
+std::string userInputPhone = "SAMPLE_PHONE";
 
 struct Record {
     int Idx;
@@ -206,15 +208,15 @@ std::string getUserInputIC() {
 	std::string tmpUserInputIC;
 	//std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	do {
-        std::cout << "Please type in ic value to search for (< 10 chars) : "; // testing asnwer: sample-50-recs.csv
+        std::cout << "Please type in ic to search for (< 10 chars) : "; // testing asnwer: sample-50-recs.csv
         std::getline(std::cin, tmpUserInputIC); 
 		
         if (tmpUserInputIC.empty()) {
             std::cout << "Error: Input cannot be empty. Please enter a valid ic.\n";
             continue;
         }
-        else if (!validateRegex(tmpUserInputIC, R"(^.{1,9}$)")) {
-            std::cout << "Input too long. Please enter data again ( < 10 chars) : \n";
+        else if (!validateRegex(tmpUserInputIC, R"(^\S{1,9}$)")) {
+            std::cout << "INPUT_ERROR\n";
             continue;
         }
 		break;
@@ -225,14 +227,14 @@ std::string getUserInputIC() {
 
 void ICExactFound(const std::vector<Record> &records) {
 	bool found = false;
-	//std::cout << UserInputIC;
+	int matchCount  = 0;
+	//std::cout << userInputIC;
     for (const auto &rec : records) {
     	//std::cout<<rec.IC;
-		if (rec.IC == UserInputIC) {
+		if (rec.IC == userInputIC) {
 			if (!found) {
                 std::cout << "======================================================================================================================\n";
                 std::cout << std::left 
-                          << std::setw(8)  << "Idx"
                           << std::setw(11) << "IC"
                           << std::setw(36) << "Name"
                           << std::setw(16) << "Phone"
@@ -242,8 +244,8 @@ void ICExactFound(const std::vector<Record> &records) {
                           << std::endl;
                 std::cout << "======================================================================================================================\n";
             }
+            matchCount ++;
             std::cout << std::left
-                      << std::setw(8)  << rec.Idx
                       << std::setw(11) << rec.IC
                       << std::setw(36) << rec.Name
                       << std::setw(16) << rec.PhoneNum
@@ -254,20 +256,21 @@ void ICExactFound(const std::vector<Record> &records) {
             found = true;
             }
 		}	
+	std::cout <<"\n" << matchCount << " records found"<<std::endl;
 	if (!found) {
-		std::cout << "No record found with IC: " << UserInputIC << std::endl;
+		std::cout << "No record found with IC" << userInputIC << std::endl;
 	}
 } 
 
 void ICPartialFound(const std::vector<Record> &records) {
 	bool found = false;
+	int matchCount  = 0;
     for (const auto &rec : records) {
     	//std::cout<<rec.IC;
-		if (rec.IC.find(UserInputIC) != std::string::npos) {
+		if (rec.IC.find(userInputIC) != std::string::npos) {
 			if (!found) {
                 std::cout << "======================================================================================================================\n";
                 std::cout << std::left 
-                          << std::setw(8)  << "Idx"
                           << std::setw(11) << "IC"
                           << std::setw(36) << "Name"
                           << std::setw(16) << "Phone"
@@ -277,8 +280,8 @@ void ICPartialFound(const std::vector<Record> &records) {
                           << std::endl;
                 std::cout << "======================================================================================================================\n";
             }
+            matchCount ++;
             std::cout << std::left
-                      << std::setw(8)  << rec.Idx
                       << std::setw(11) << rec.IC
                       << std::setw(36) << rec.Name
                       << std::setw(16) << rec.PhoneNum
@@ -289,15 +292,16 @@ void ICPartialFound(const std::vector<Record> &records) {
             found = true;
             }
 	}	
+	std::cout <<"\n" << matchCount << " records found"<<std::endl;
 	if (!found) {
-		std::cout << "No record found with IC: " << UserInputIC << std::endl;
+		std::cout << "No record found with IC" << userInputIC << std::endl;
     }
 }       
 
 void searchICTask(int userinput, const std::vector<Record> &records) {
 	switch (userinput) {
 		case 1:
-			UserInputIC = getUserInputIC();
+			userInputIC = getUserInputIC();
 			break;
 		case 2:
 			ICExactFound(records);
@@ -317,16 +321,15 @@ std::string getUserInputName() {
 	std::string tmpUserInputName;
 	//std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	do {
-        std::cout << "Please type in name value to search for (< 35 chars) : "; // testing asnwer: sample-50-recs.csv
+        std::cout << "Please type in name to search for (< 35 chars) : "; // testing asnwer: sample-50-recs.csv
         std::getline(std::cin, tmpUserInputName); 
 		
         if (tmpUserInputName.empty()) {
             std::cout << "Error: Input cannot be empty. Please enter a valid name.\n";
             continue;
         }
-        else if (!validateRegex(tmpUserInputName, R"(^(?=.{1,35}$)[A-Za-z\s'-]+$)"
-)) {
-            std::cout << "Input too long. Please enter data again ( < 35 chars) : \n";
+        else if (!validateRegex(tmpUserInputName, R"(^(?=.{1,35}$)(?=.*\S)[A-Za-z\s'-]+$)")) {
+            std::cout << "INPUT_ERROR\n";
             continue;
         }
 		break;
@@ -337,12 +340,20 @@ std::string getUserInputName() {
 
 void NameExactFound(const std::vector<Record> &records) {
 	bool found = false;
+	int matchCount  = 0;
+	std::string tmpNameLower = userInputName;
+    std::transform(tmpNameLower.begin(), tmpNameLower.end(), tmpNameLower.begin(),
+                   [](unsigned char c){ return std::tolower(c); });
+                   
     for (const auto &rec : records) {
-		if (rec.Name == userInputName ) {
+    	std::string tmpRecNameLower = rec.Name;
+		std::transform(tmpRecNameLower.begin(), tmpRecNameLower.end(), tmpRecNameLower.begin(),
+                       [](unsigned char c){ return std::tolower(c); });
+                       
+		if (tmpRecNameLower == tmpNameLower ) {
 			if (!found) {
                 std::cout << "======================================================================================================================\n";
                 std::cout << std::left 
-                          << std::setw(8)  << "Idx"
                           << std::setw(11) << "IC"
                           << std::setw(36) << "Name"
                           << std::setw(16) << "Phone"
@@ -352,8 +363,8 @@ void NameExactFound(const std::vector<Record> &records) {
                           << std::endl;
                 std::cout << "======================================================================================================================\n";
             }
+            matchCount ++;
             std::cout << std::left
-                      << std::setw(8)  << rec.Idx
                       << std::setw(11) << rec.IC
                       << std::setw(36) << rec.Name
                       << std::setw(16) << rec.PhoneNum
@@ -364,21 +375,29 @@ void NameExactFound(const std::vector<Record> &records) {
             found = true;
             }
 	}	
+	std::cout <<"\n" << matchCount << " records found"<<std::endl;
 	if (!found) {
-		std::cout << "No record found with IC: " << userInputName << std::endl;
+		std::cout << "No record found with name" << userInputName << std::endl;
    	}
 } 
 
 
 void NamePartialFound(const std::vector<Record> &records) {
 	bool found = false;
+	int matchCount  = 0;
+	std::string tmpNameLower = userInputName;
+    std::transform(tmpNameLower.begin(), tmpNameLower.end(), tmpNameLower.begin(),
+                   [](unsigned char c){ return std::tolower(c); });
+                   
     for (const auto &rec : records) {
-    	//std::cout<<rec.IC;
-		if (rec.Name.find(userInputName) != std::string::npos) {
+    	std::string tmpRecNameLower = rec.Name;
+		std::transform(tmpRecNameLower.begin(), tmpRecNameLower.end(), tmpRecNameLower.begin(),
+                       [](unsigned char c){ return std::tolower(c); });
+    	
+		if (tmpRecNameLower.find(tmpNameLower) != std::string::npos) {
 			if (!found) {
                 std::cout << "======================================================================================================================\n";
                 std::cout << std::left 
-                          << std::setw(8)  << "Idx"
                           << std::setw(11) << "IC"
                           << std::setw(36) << "Name"
                           << std::setw(16) << "Phone"
@@ -388,8 +407,8 @@ void NamePartialFound(const std::vector<Record> &records) {
                           << std::endl;
                 std::cout << "======================================================================================================================\n";
             }
+            matchCount ++;
             std::cout << std::left
-                      << std::setw(8)  << rec.Idx
                       << std::setw(11) << rec.IC
                       << std::setw(36) << rec.Name
                       << std::setw(16) << rec.PhoneNum
@@ -400,8 +419,9 @@ void NamePartialFound(const std::vector<Record> &records) {
             found = true;
             }
 	}	
+	std::cout <<"\n" << matchCount << " records found"<<std::endl;
 	if (!found) {
-		std::cout << "No record found with name: " << userInputName << std::endl;
+		std::cout << "No record found with name" << userInputName << std::endl;
     }
 }
 
@@ -425,3 +445,238 @@ void searchNameTask(int userinput, const std::vector<Record> &records) {
 	}
 }
 
+
+std::string getUserInputEmail() {
+	std::string tmpUserInputEmail;
+	//std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	do {
+        std::cout << "Please type in email to search for (< 35 chars) : "; // testing asnwer: sample-50-recs.csv
+        std::getline(std::cin, tmpUserInputEmail); 
+		
+        if (tmpUserInputEmail.empty()) {
+            std::cout << "Error: Input cannot be empty. Please enter a valid email.\n";
+            continue;
+        }
+        else if (!validateRegex(tmpUserInputEmail, R"(^(?=.{1,35}$)\S+$)")) {
+            std::cout << "INPUT_ERROR\n";
+            continue;
+        }
+      
+		break;
+    } while (true); // Repeat until a valid filename is entered
+    return tmpUserInputEmail;
+}
+
+
+void EmailExactFound(const std::vector<Record> &records) {
+	bool found = false;
+	int matchCount  = 0;
+    for (const auto &rec : records) {
+		if (rec.Email == userInputEmail ) {
+			if (!found) {
+                std::cout << "======================================================================================================================\n";
+                std::cout << std::left 
+                          << std::setw(11) << "IC"
+                          << std::setw(36) << "Name"
+                          << std::setw(16) << "Phone"
+                          << std::setw(16) << "Birth Date"
+                          << std::setw(16) << "Hired Date"
+                          << "Email" 
+                          << std::endl;
+                std::cout << "======================================================================================================================\n";
+            }
+            matchCount ++;
+            std::cout << std::left
+                      << std::setw(11) << rec.IC
+                      << std::setw(36) << rec.Name
+                      << std::setw(16) << rec.PhoneNum
+                      << std::setw(16) << rec.BirthDate
+                      << std::setw(16) << rec.HireDate
+                      << rec.Email
+                      << std::endl;
+            found = true;
+            }
+	}	
+	std::cout <<"\n" << matchCount << " records found"<<std::endl;	
+	if (!found) {
+		std::cout << "No record found with email: " << userInputEmail << std::endl;
+   	}
+} 
+
+
+void EmailPartialFound(const std::vector<Record> &records) {
+	bool found = false;
+	int matchCount  = 0;
+	std::string tmpEmailLower = userInputEmail;
+    std::transform(tmpEmailLower.begin(), tmpEmailLower.end(), tmpEmailLower.begin(),
+                   [](unsigned char c){ return std::tolower(c); });
+                   
+    for (const auto &rec : records) {
+    	std::string tmpRecEmailLower = rec.Email;
+		std::transform(tmpRecEmailLower.begin(), tmpRecEmailLower.end(), tmpRecEmailLower.begin(),
+                       [](unsigned char c){ return std::tolower(c); });
+    	
+		if (tmpRecEmailLower.find(tmpEmailLower) != std::string::npos) {
+			if (!found) {
+                std::cout << "======================================================================================================================\n";
+                std::cout << std::left 
+                          << std::setw(11) << "IC"
+                          << std::setw(36) << "Name"
+                          << std::setw(16) << "Phone"
+                          << std::setw(16) << "Birth Date"
+                          << std::setw(16) << "Hired Date"
+                          << "Email" 
+                          << std::endl;
+                std::cout << "======================================================================================================================\n";
+            }
+            matchCount ++;
+            std::cout << std::left
+                      << std::setw(11) << rec.IC
+                      << std::setw(36) << rec.Name
+                      << std::setw(16) << rec.PhoneNum
+                      << std::setw(16) << rec.BirthDate
+                      << std::setw(16) << rec.HireDate
+                      << rec.Email
+                      << std::endl;
+            found = true;
+            }
+	}
+	std::cout <<"\n" << matchCount << " records found"<<std::endl;	
+	if (!found) {
+		std::cout << "No record found with email: " << userInputEmail << std::endl;
+    }
+}
+
+
+void searchEmailTask(int userinput, const std::vector<Record> &records) {
+	switch (userinput) {
+		case 1:
+			userInputEmail = getUserInputEmail();
+			break;
+		case 2:
+			EmailExactFound(records);
+			break;
+		case 3:
+			EmailPartialFound(records);
+			break;
+		case 4:
+			break;
+		 default:
+            std::cout << "Invalid choice. Please try again.\n";
+            break;
+	}
+}
+
+
+std::string getUserInputPhone() {
+	std::string tmpUserInputPhone;
+	//std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	do {
+        std::cout << "Please type in phone number to search for (< 15 chars) : "; // testing asnwer: sample-50-recs.csv
+        std::getline(std::cin, tmpUserInputPhone); 
+		
+        if (tmpUserInputPhone.empty()) {
+            std::cout << "Error: Input cannot be empty. Please enter a valid phone number.\n";
+            continue;
+        }
+        else if (!validateRegex(tmpUserInputPhone, R"(^[0-9()\-]{1,15}$)")) {
+            std::cout << "INPUT_ERROR\n";
+            continue;
+        }
+		break;
+    } while (true); // Repeat until a valid filename is entered
+    return tmpUserInputPhone;
+}
+
+
+void PhoneExactFound(const std::vector<Record> &records) {
+	bool found = false;
+	int matchCount  = 0;
+    for (const auto &rec : records) {
+		if (rec.PhoneNum == userInputPhone ) {
+			if (!found) {
+                std::cout << "======================================================================================================================\n";
+                std::cout << std::left 
+                          << std::setw(11) << "IC"
+                          << std::setw(36) << "Name"
+                          << std::setw(16) << "Phone"
+                          << std::setw(16) << "Birth Date"
+                          << std::setw(16) << "Hired Date"
+                          << "Email" 
+                          << std::endl;
+                std::cout << "======================================================================================================================\n";
+            }
+            matchCount ++;
+            std::cout << std::left
+                      << std::setw(11) << rec.IC
+                      << std::setw(36) << rec.Name
+                      << std::setw(16) << rec.PhoneNum
+                      << std::setw(16) << rec.BirthDate
+                      << std::setw(16) << rec.HireDate
+                      << rec.Email
+                      << std::endl;
+            found = true;
+            }
+	}	
+	std::cout <<"\n" << matchCount << " records found"<<std::endl;	
+	if (!found) {
+		std::cout << "No record found with phone number: " << userInputPhone << std::endl;
+   	}
+} 
+
+
+void PhonePartialFound(const std::vector<Record> &records) {
+	bool found = false;
+	int matchCount  = 0;
+                   
+    for (const auto &rec : records) {
+    	
+		if (rec.PhoneNum.find(userInputPhone) != std::string::npos) {
+			if (!found) {
+                std::cout << "======================================================================================================================\n";
+                std::cout << std::left 
+                          << std::setw(11) << "IC"
+                          << std::setw(36) << "Name"
+                          << std::setw(16) << "Phone"
+                          << std::setw(16) << "Birth Date"
+                          << std::setw(16) << "Hired Date"
+                          << "Email" 
+                          << std::endl;
+                std::cout << "======================================================================================================================\n";
+            }
+            matchCount ++;
+            std::cout << std::left
+                      << std::setw(11) << rec.IC
+                      << std::setw(36) << rec.Name
+                      << std::setw(16) << rec.PhoneNum
+                      << std::setw(16) << rec.BirthDate
+                      << std::setw(16) << rec.HireDate
+                      << rec.Email
+                      << std::endl;
+            found = true;
+            }
+	}
+	std::cout <<"\n" << matchCount << " records found"<<std::endl;	
+	if (!found) {
+		std::cout << "No record found with phone number: " << userInputPhone << std::endl;
+    }
+}
+
+void searchPhoneTask(int userinput, const std::vector<Record> &records) {
+	switch (userinput) {
+		case 1:
+			userInputPhone = getUserInputPhone();
+			break;
+		case 2:
+			PhoneExactFound(records);
+			break;
+		case 3:
+			PhonePartialFound(records);
+			break;
+		case 4:
+			break;
+		 default:
+            std::cout << "Invalid choice. Please try again.\n";
+            break;
+	}
+}
