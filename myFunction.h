@@ -6,6 +6,8 @@
 #include <unordered_map>
 #include <iostream>
 
+extern int captureCount;
+
 extern std::string userInputIC;
 extern std::string userInputName;
 extern std::string userInputEmail;
@@ -36,6 +38,8 @@ void searchICTask(int userinput, const std::vector<Record> &records);
 void searchNameTask(int userinput, const std::vector<Record> &records);
 void searchEmailTask(int userinput, const std::vector<Record> &records);
 void searchPhoneTask(int userinput, const std::vector<Record> &records);
+
+void insertNewRecord(std::vector<Record>& records);
 
 #endif
 

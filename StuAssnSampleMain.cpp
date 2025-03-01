@@ -98,7 +98,7 @@ int main()
                 break;
 
             case 8:
-                cout << "Design your own function(s) to handle: INSERT New Employee Record" << endl;
+                	insertNewRecord(records);
                 break;
 
             case 9:

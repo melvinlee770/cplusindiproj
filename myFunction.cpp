@@ -7,6 +7,12 @@
 #include <regex> 	
 #include <iomanip>
 
+#include <algorithm>
+#include <cctype>
+#include <locale>
+
+int captureCount = 1; 
+
 std::string userInputIC = "00";
 std::string userInputName = "SAMPLE_NAME";
 std::string userInputEmail = "SAMPLE_EMAIL";
@@ -90,10 +96,17 @@ std::string formatDate(const std::string &date) {
 }
 
 void loadCSV(const std::string &filename, std::vector<Record> &records, int limit) {
+	
+
     std::ifstream file(filename);
     if (!file.is_open()) {
         std::cerr << "Error opening file." << std::endl;
         return;
+    }
+    
+    if (captureCount > 1) {
+    	std::cerr << "You already captured the file" <<std::endl;
+    	return;
     }
     
     std::string line;
@@ -124,6 +137,7 @@ void loadCSV(const std::string &filename, std::vector<Record> &records, int limi
         
         records.push_back(record);
         count++;
+        captureCount++;
     }
     file.close();
 }
@@ -142,7 +156,7 @@ void displayRecords(const std::vector<Record> &records) {
         std::getline(std::cin, tmpIndex); 
 		
         if (tmpIndex.empty()) {
-            std::cout << "Error: Filename cannot be empty. Please enter a valid filename.\n";
+            std::cout << "Error: Filename cannot be empty. Please enter a valid input\n";
             continue;
         }
         else if (!validateRegex(tmpIndex, "^[ynYN]$")) {
@@ -215,7 +229,7 @@ std::string getUserInputIC() {
             std::cout << "Error: Input cannot be empty. Please enter a valid ic.\n";
             continue;
         }
-        else if (!validateRegex(tmpUserInputIC, R"(^\S{1,9}$)")) {
+        else if (!validateRegex(tmpUserInputIC,R"(^[A-Za-z0-9]{1,9}$)")) {
             std::cout << "INPUT_ERROR\n";
             continue;
         }
@@ -680,3 +694,208 @@ void searchPhoneTask(int userinput, const std::vector<Record> &records) {
             break;
 	}
 }
+
+
+bool checkDataExist(const std::vector<Record>& records, std::string Record::* member ,const std::string tmpInputData) {
+	bool exists = false;
+	for (const auto &rec : records) {
+		if (rec.*member == tmpInputData) {
+			exists = true;
+			break;
+		}
+	}
+	return exists;
+}
+
+
+std::string getUserInputNameWithConfirmation(const std::vector<Record>& records) {
+    std::string tmpUserInputName;
+    std::string tmpAns;
+    while (true) {
+        std::cout << "Please type in employee's name (< 35 chars): ";
+        std::getline(std::cin, tmpUserInputName);
+        
+        if (tmpUserInputName.empty()) {
+            std::cout << "Error: Input cannot be empty. Please enter a valid name.\n";
+            continue;
+        }
+        
+        // Validate input using the same regex as before.
+        else if (!validateRegex(tmpUserInputName, R"(^(?=.{1,35}$)(?=.*\S)[A-Za-z\s'-]+$)")) {
+            std::cout << "INPUT_ERROR\n";
+            continue;
+        }
+        else if ((checkDataExist(records, &Record::Name ,tmpUserInputName) == true)) {
+			do {
+            	std::cout << "Error! Name '" << tmpUserInputName << "' already exists in the data. Do you INSIST this is correct? (y/n): ";
+            	std::getline(std::cin, tmpAns);
+            
+            	if (tmpAns.empty()) {
+            		std::cout << "Error: Input cannot be empty. Please enter a valid input\n";
+                	continue;
+            	}
+            	if (!validateRegex(tmpAns, "^[ynYN]$")) {
+                	std::cout << "INPUT_ERROR\n";
+                	continue;
+            	}
+            	break;  // Input is valid, exit the loop.
+        	} while(true);   
+        	if (tmpAns == "Y" || tmpAns == "y") {
+        		std::cout << "Alright! you insisted storing (duplicate) Name '"<<tmpUserInputName<<"' under this Employee Record in DB ...\n";
+        		return tmpUserInputName;
+        	}   	
+        	else if (tmpAns == "n" || tmpAns == "N") {
+        		continue;
+        	}
+        }
+        else {
+        	return tmpUserInputName;
+        }
+    }
+}
+
+
+std::string getUserInputPhoneNumWithConfirmation(const std::vector<Record>& records) {
+    std::string tmpUserInputPhoneNum;
+    std::string tmpAns;
+    while (true) {
+        std::cout << "Please type in employee's phone number (< 35 chars): ";
+        std::getline(std::cin, tmpUserInputPhoneNum);
+        
+        if (tmpUserInputPhoneNum.empty()) {
+            std::cout << "Error: Input cannot be empty. Please enter a valid phone number.\n";
+            continue;
+        }
+        
+        // Validate input using the same regex as before.
+        else if (!validateRegex(tmpUserInputPhoneNum, R"(^[0-9()\-]{1,15}$)")) {
+            std::cout << "INPUT_ERROR\n";
+            continue;
+        }
+        else if ((checkDataExist(records, &Record::PhoneNum ,tmpUserInputPhoneNum) == true)) {
+			do {
+            	std::cout << "Error! Phone Num '" << tmpUserInputPhoneNum << "' already exists in the data. Do you INSIST this is correct? (y/n): ";
+            	std::getline(std::cin, tmpAns);
+            
+            	if (tmpAns.empty()) {
+            		std::cout << "Error: Input cannot be empty. Please enter a valid input\n";
+                	continue;
+            	}
+            	if (!validateRegex(tmpAns, "^[ynYN]$")) {
+                	std::cout << "INPUT_ERROR\n";
+                	continue;
+            	}
+            	break;  // Input is valid, exit the loop.
+        	} while(true);   
+        	if (tmpAns == "Y" || tmpAns == "y") {
+        		std::cout << "Alright! you insisted storing (duplicate) phone num '"<<tmpUserInputPhoneNum<<"' under this Employee Record in DB ...\n";
+        		return tmpUserInputPhoneNum;
+        	}   	
+        	else if (tmpAns == "n" || tmpAns == "N") {
+        		continue;
+        	}
+        }
+        else {
+        	return tmpUserInputPhoneNum;
+        }
+    }
+}
+
+void insertNewRecord(std::vector<Record>& records) {
+    Record newRecord;
+    
+    // Determine new index: if records are empty, start at 1; otherwise, use the last record's index + 1.
+    newRecord.Idx = records.empty() ? 1 : records.back().Idx + 1;
+    std::cout << "\n--- Inserting New Record ---\n";
+    
+    newRecord.Name = getUserInputNameWithConfirmation(records);
+    
+	do {
+        std::cout << "Please type in employee's ic (< 10 chars) : "; 
+        std::getline(std::cin, newRecord.IC); 
+		
+        if (newRecord.IC.empty()) {
+            std::cout << "Error: Input cannot be empty. Please enter a valid ic.\n";
+            continue;
+        }
+        else if (!validateRegex(newRecord.IC,R"(^[A-Za-z0-9]{1,9}$)")) {
+            std::cout << "INPUT_ERROR\n";
+            continue;
+        }
+        else if (checkDataExist(records, &Record::IC ,newRecord.IC) == true) {
+        	std::cout << "Error! IC No. '"<<newRecord.IC<<"' already exists in employee records DB, please try again!\n";
+        	continue;
+        }
+		break;
+    } while (true); 
+  
+  
+	do {
+        std::cout << "Please type in employee's email (< 35 chars) : "; // testing asnwer: sample-50-recs.csv
+        std::getline(std::cin, newRecord.Email); 
+		
+        if (newRecord.Email.empty()) {
+            std::cout << "Error: Input cannot be empty. Please enter a valid email.\n";
+            continue;
+        }
+        else if (!validateRegex(newRecord.Email, R"(^(?=.{1,35}$)\S+$)")) {
+            std::cout << "INPUT_ERROR\n";
+            continue;
+        }
+      	else if (checkDataExist(records, &Record::Email, newRecord.Email) == true) {
+      		std::cout << "Error! Email '"<<newRecord.Email<<"' already exists in employee records DB, please try again!\n";
+      		continue;
+      	}
+		break;
+    } while (true); // Repeat until a valid filename is entered
+	std::cout << newRecord.Email<<std::endl;
+
+    newRecord.PhoneNum = getUserInputPhoneNumWithConfirmation(records);
+    
+    
+	do {
+        std::cout << "To enter employee's date of birth, please adhere to the format shown in prompt below...\n";
+        std::cout << "Enter a data (dd-mm-yyyy) : "; 
+        std::getline(std::cin, newRecord.BirthDate); 
+		
+        if (newRecord.BirthDate.empty()) {
+            std::cout << "Error: Input cannot be empty. Please enter a valid ic.\n";
+            continue;
+        }
+        else if (!validateRegex(newRecord.BirthDate,R"(^(0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])-\d{4}$)")) {
+            std::cout << "INPUT_ERROR\n";
+            continue;
+        }
+		break;
+    } while (true); 
+    
+    
+    do {
+        std::cout << "To enter employee's date of hire, please adhere to the format shown in prompt below...\n";
+        std::cout << "Enter a data (dd-mm-yyyy) : "; 
+        std::getline(std::cin, newRecord.HireDate); 
+		
+        if (newRecord.HireDate.empty()) {
+            std::cout << "Error: Input cannot be empty. Please enter a valid ic.\n";
+            continue;
+        }
+        else if (!validateRegex(newRecord.HireDate,R"(^(0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])-\d{4}$)")) {
+            std::cout << "INPUT_ERROR\n";
+            continue;
+        }
+		break;
+    } while (true); 
+    
+    
+    /*
+    newRecord.Name = "Melvin";
+    newRecord.Email = "melvinlee0199@gmail.com";
+    newRecord.IC = "T01765821";
+    newRecord.PhoneNum = "(65)-84158771";
+    newRecord.HireDate = "01/01/2001";
+    newRecord.BirthDate = "02/02/2002";
+    */
+    records.push_back(newRecord);
+    std::cout << "New record inserted successfully!\n";
+}
+
