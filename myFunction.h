@@ -13,6 +13,8 @@ extern std::string userInputName;
 extern std::string userInputEmail;
 extern std::string userInputPhone;
 
+extern std::string userUpdata;
+
 struct Record {
     int Idx;
     std::string Name;
@@ -40,6 +42,10 @@ void searchEmailTask(int userinput, const std::vector<Record> &records);
 void searchPhoneTask(int userinput, const std::vector<Record> &records);
 
 void insertNewRecord(std::vector<Record>& records);
+
+void updataRecord(std::vector<Record>& records);
+
+void deleteRecord(std::vector<Record>& records);
 
 #endif
 

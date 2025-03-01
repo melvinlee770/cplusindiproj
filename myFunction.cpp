@@ -28,6 +28,19 @@ struct Record {
     std::string BirthDate;
 };
 
+std::string trim(const std::string &s) {
+    auto start = s.begin();
+    while (start != s.end() && std::isspace(*start))
+        start++;
+    
+    auto end = s.end();
+    do {
+        end--;
+    } while (std::distance(start, end) > 0 && std::isspace(*end));
+    
+    return std::string(start, end + 1);
+}
+
 void printHelloWorld() {	// for testing the linking of the file
     std::cout << "helloworld" << std::endl;
 }
@@ -471,7 +484,7 @@ std::string getUserInputEmail() {
             std::cout << "Error: Input cannot be empty. Please enter a valid email.\n";
             continue;
         }
-        else if (!validateRegex(tmpUserInputEmail, R"(^(?=.{1,35}$)\S+$)")) {
+        else if (!validateRegex(tmpUserInputEmail, R"(^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{1,}$)")) {
             std::cout << "INPUT_ERROR\n";
             continue;
         }
@@ -838,7 +851,7 @@ void insertNewRecord(std::vector<Record>& records) {
             std::cout << "Error: Input cannot be empty. Please enter a valid email.\n";
             continue;
         }
-        else if (!validateRegex(newRecord.Email, R"(^(?=.{1,35}$)\S+$)")) {
+        else if (!validateRegex(newRecord.Email, R"(^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{1,}$)")) {
             std::cout << "INPUT_ERROR\n";
             continue;
         }
@@ -899,3 +912,541 @@ void insertNewRecord(std::vector<Record>& records) {
     std::cout << "New record inserted successfully!\n";
 }
 
+int updateMenu(std::string updateIC, std::string updateName, std::string updatePhoneNum, std::string updateBirthDate, std::string updateHireDate, std::string updateEmail) {
+	int updateEnteredNumber;
+	std::string tmpUpdateEnteredNumber;
+	
+	do {
+		std::cout << "\n+++ Item to be updated +++"<<std::endl;
+		std::cout << "++++++++++++++++++++++++++"<<std::endl;
+		std::cout << "1) Update IC			(curr. value = '"<<updateIC<<"')"<<std::endl;
+		std::cout << "2) Update Email			(curr. value = '"<<updateEmail<<"')"<<std::endl;
+		std::cout << "3) Update Name			(curr. value = '"<<updateName<<"')"<<std::endl;
+		std::cout << "4) Update Phone Number		(curr. value = '"<<updatePhoneNum<<"')"<<std::endl;
+		std::cout << "5) Update Birth Date		(curr. value = '"<<updateBirthDate<<"')"<<std::endl;
+		std::cout << "6) Update Hired Date		(curr. value = '"<<updateHireDate<<"')"<<std::endl;
+		std::cout << "7) Done with update"<<std::endl;
+		std::cout << "++++++++++++++++++++++++++"<<std::endl;
+	   
+		std::cout <<"Please enter your choice (1 - 7): "; // testing asnwer: sample-50-recs.csv
+        std::getline(std::cin, tmpUpdateEnteredNumber); 
+		
+       	if (tmpUpdateEnteredNumber.empty()) {
+        	std::cout << "Error: Input cannot be empty. Please enter a valid number.\n";
+            continue;
+       	}
+        
+       	else if (!validateRegex(tmpUpdateEnteredNumber, R"(^[1-7]$)")) {
+        	std::cout << "INPUT_ERROR\n";
+            continue;
+        }
+		break;
+	}while(true);
+	updateEnteredNumber = std::stoi(tmpUpdateEnteredNumber);
+	return (updateEnteredNumber);
+}
+
+std::string updateEmployeeIC(std::vector<Record>& records, const std::string& currentIC) {
+    std::string newIC;
+    do {
+        std::cout << "Please enter the new IC (< 10 chars): ";
+        std::getline(std::cin, newIC);
+        
+        if (newIC.empty()) {
+            std::cout << "Error: Input cannot be empty. Please enter a valid IC.\n";
+            continue;
+        }
+        else if (!validateRegex(newIC, R"(^[A-Za-z0-9]{1,9}$)")) {
+            std::cout << "INPUT_ERROR\n";
+            continue;
+        }
+        else if (checkDataExist(records, &Record::IC, newIC)) {
+            std::cout << "Error! IC No. '" << newIC << "' already exists in employee records DB, please try again!\n";
+            continue;
+        }
+        break;
+    } while (true);
+    return newIC;
+}
+
+
+std::string updateEmployeeEmail(std::vector<Record>& records, const std::string& currentEmail) {
+    std::string newEmail;
+    do {
+        std::cout << "Please type in employee's email (< 35 chars): ";
+        std::getline(std::cin, newEmail);
+
+        if (newEmail.empty()) {
+            std::cout << "Error: Input cannot be empty. Please enter a valid email.\n";
+            continue;
+        }
+        // Using a simple email regex pattern.
+        else if (!validateRegex(newEmail, R"(^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{1,}$)")) {
+            std::cout << "INPUT_ERROR\n";
+            continue;
+        }
+        else if (checkDataExist(records, &Record::Email, newEmail)) {
+            std::cout << "Error! Email '" << newEmail << "' already exists in employee records DB, please try again!\n";
+            continue;
+        }
+        break;
+    } while (true);
+    return newEmail;
+}
+
+
+std::string updateEmployeeName(std::vector<Record>& records, const std::string& currentName) {
+    std::string newName;
+    std::string tmpAns;
+    do {
+        std::cout << "Please enter the new employee name (<35 chars): ";
+        std::getline(std::cin, newName);
+        
+        if (newName.empty()) {
+            std::cout << "Error: Input cannot be empty. Please enter a valid name.\n";
+            continue;
+        }
+        // Validate that the name contains only letters and spaces and is between 1 and 50 characters long.
+        else if (!validateRegex(newName, R"(^(?=.{1,35}$)(?=.*\S)[A-Za-z\s'-]+$)")) {
+            std::cout << "INPUT_ERROR\n";
+            continue;
+        }
+        else if ((checkDataExist(records, &Record::Name ,newName) == true)) {
+			do {
+            	std::cout << "Error! Name '" << newName << "' already exists in the data. Do you INSIST this is correct? (y/n): ";
+            	std::getline(std::cin, tmpAns);
+            
+            	if (tmpAns.empty()) {
+            		std::cout << "Error: Input cannot be empty. Please enter a valid input\n";
+                	continue;
+            	}
+            	if (!validateRegex(tmpAns, "^[ynYN]$")) {
+                	std::cout << "INPUT_ERROR\n";
+                	continue;
+            	}
+            	break;  // Input is valid, exit the loop.
+        	} while(true);   
+        	if (tmpAns == "Y" || tmpAns == "y") {
+        		std::cout << "Alright! you insisted storing (duplicate) Name '"<<newName<<"' under this Employee Record in DB ...\n";
+        		return newName;
+        	}   	
+        	else if (tmpAns == "n" || tmpAns == "N") {
+        		continue;
+        	}
+        }
+        break;
+    } while (true);
+    return newName;
+}
+
+
+
+std::string updateEmployeePhoneNum(std::vector<Record>& records, const std::string& currentPhoneNum) {
+    std::string newPhoneNum;
+    std::string tmpAns;
+    do {
+        std::cout << "Please type in employee's phone number (<15 chars): ";
+        std::getline(std::cin, newPhoneNum);
+
+        if (newPhoneNum.empty()) {
+            std::cout << "Error: Input cannot be empty. Please enter a valid phone number.\n";
+            continue;
+        }
+        // Validate that the phone number contains only digits and is between 7 and 15 characters long.
+        else if (!validateRegex(newPhoneNum, R"(^[0-9()\-]{1,15}$)")) {
+            std::cout << "INPUT_ERROR\n";
+            continue;
+        }
+        else if ((checkDataExist(records, &Record::PhoneNum , newPhoneNum) == true)) {
+			do {
+            	std::cout << "Error! Phone Num '" << newPhoneNum << "' already exists in the data. Do you INSIST this is correct? (y/n): ";
+            	std::getline(std::cin, tmpAns);
+            
+            	if (tmpAns.empty()) {
+            		std::cout << "Error: Input cannot be empty. Please enter a valid input\n";
+                	continue;
+            	}
+            	if (!validateRegex(tmpAns, "^[ynYN]$")) {
+                	std::cout << "INPUT_ERROR\n";
+                	continue;
+            	}
+            	break;  // Input is valid, exit the loop.
+        	} while(true);   
+        	if (tmpAns == "Y" || tmpAns == "y") {
+        		std::cout << "Alright! you insisted storing (duplicate) phone num '"<< newPhoneNum<<"' under this Employee Record in DB ...\n";
+        		return newPhoneNum;
+        	}   	
+        	else if (tmpAns == "n" || tmpAns == "N") {
+        		continue;
+        	}
+        }
+        break;
+    } while (true);
+    return newPhoneNum;
+}
+
+
+std::string updateEmployeeBirthDate(std::vector<Record>& records, const std::string& currentBirthDate) {
+    std::string newBirthDate;
+    do {
+        std::cout << "Please enter the new birth date (dd-mm-yyyy): ";
+        std::getline(std::cin, newBirthDate);
+        
+        if (newBirthDate.empty()) {
+            std::cout << "Error: Input cannot be empty. Please enter a valid birth date.\n";
+            continue;
+        }
+        
+        // Check that the input has exactly 10 characters and '-' is used at the correct positions.
+        if (newBirthDate.size() != 10 || newBirthDate[2] != '-' || newBirthDate[5] != '-') {
+            std::cout << "INPUT_ERROR: Date format must be dd-mm-yyyy with '-' as the delimiter.\n";
+            continue;
+        }
+        
+        // Validate the basic date format using regex.
+        if (!validateRegex(newBirthDate, R"(^[0-9]{2}-[0-9]{2}-[0-9]{4}$)")) {
+            std::cout << "INPUT_ERROR: Date format must be dd-mm-yyyy.\n";
+            continue;
+        }
+        
+        // Parse the date components: day, month, and year.
+        int day, month, year;
+        char dash1, dash2;
+        std::istringstream iss(newBirthDate);
+        if (!(iss >> day >> dash1 >> month >> dash2 >> year) || dash1 != '-' || dash2 != '-') {
+            std::cout << "INPUT_ERROR: Unable to parse date components.\n";
+            continue;
+        }
+        
+        // Validate month range.
+        if (month < 1 || month > 12) {
+            std::cout << "INPUT_ERROR: Month must be between 01 and 12.\n";
+            continue;
+        }
+        
+        // Determine the maximum day allowed for the given month (with leap year check for February).
+        int maxDay;
+        switch (month) {
+            case 4: case 6: case 9: case 11:
+                maxDay = 30;
+                break;
+            case 2:
+                // Leap year: divisible by 400 or divisible by 4 but not by 100.
+                if ((year % 400 == 0) || ((year % 4 == 0) && (year % 100 != 0))) {
+                    maxDay = 29;
+                } else {
+                    maxDay = 28;
+                }
+                break;
+            default:
+                maxDay = 31;
+        }
+        
+        // Validate day range.
+        if (day < 1 || day > maxDay) {
+            std::cout << "INPUT_ERROR: Day must be between 1 and " << maxDay
+                      << " for month " << month << ".\n";
+            continue;
+        }
+        
+        // If all validations pass, break out of the loop.
+        break;
+    } while (true);
+    
+    // Convert the date format from dd-mm-yyyy to dd/mm/yyyy.
+    std::replace(newBirthDate.begin(), newBirthDate.end(), '-', '/');
+    return newBirthDate;
+}
+
+
+std::string updateEmployeeHireDate(std::vector<Record>& records, const std::string& currentHireDate) {
+    std::string newHireDate;
+    do {
+        std::cout << "Please enter the new hire date (dd-mm-yyyy): ";
+        std::getline(std::cin, newHireDate);
+        
+        if (newHireDate.empty()) {
+            std::cout << "Error: Input cannot be empty. Please enter a valid hire date.\n";
+            continue;
+        }
+        
+        // Check that the input has exactly 10 characters and the delimiters are '-' at the correct positions.
+        if (newHireDate.size() != 10 || newHireDate[2] != '-' || newHireDate[5] != '-') {
+            std::cout << "INPUT_ERROR: Date format must be dd-mm-yyyy with '-' as the delimiter.\n";
+            continue;
+        }
+        
+        // Validate the basic date format using regex.
+        if (!validateRegex(newHireDate, R"(^[0-9]{2}-[0-9]{2}-[0-9]{4}$)")) {
+            std::cout << "INPUT_ERROR: Date format must be dd-mm-yyyy.\n";
+            continue;
+        }
+        
+        // Parse the date components: day, month, and year.
+        int day, month, year;
+        char dash1, dash2;
+        std::istringstream iss(newHireDate);
+        if (!(iss >> day >> dash1 >> month >> dash2 >> year)) {
+            std::cout << "INPUT_ERROR: Unable to parse date components.\n";
+            continue;
+        }
+        
+        // Ensure the delimiters are correct.
+        if (dash1 != '-' || dash2 != '-') {
+            std::cout << "INPUT_ERROR: Date format must use '-' as the delimiter.\n";
+            continue;
+        }
+        
+        // Validate month range.
+        if (month < 1 || month > 12) {
+            std::cout << "INPUT_ERROR: Month must be between 01 and 12.\n";
+            continue;
+        }
+        
+        // Determine maximum day for the month (including leap year check for February).
+        int maxDay;
+        switch (month) {
+            case 4: case 6: case 9: case 11:
+                maxDay = 30;
+                break;
+            case 2:
+                // Leap year check: divisible by 400 or divisible by 4 but not by 100.
+                if ((year % 400 == 0) || ((year % 4 == 0) && (year % 100 != 0))) {
+                    maxDay = 29;
+                } else {
+                    maxDay = 28;
+                }
+                break;
+            default:
+                maxDay = 31;
+        }
+        
+        // Validate day range.
+        if (day < 1 || day > maxDay) {
+            std::cout << "INPUT_ERROR: Day must be between 1 and " << maxDay 
+                      << " for month " << month << ".\n";
+            continue;
+        }
+        
+        // All checks passed.
+        break;
+    } while (true);
+    
+    // Convert the date format from dd-mm-yyyy to dd/mm/yyyy.
+    std::replace(newHireDate.begin(), newHireDate.end(), '-', '/');
+    
+    return newHireDate;
+}
+
+
+void submitEmployeeRecordUpdate(std::vector<Record>& records, Record& rec) {
+    std::cout<<"Done! Going back to main menu ..."<<std::endl;
+}
+
+/*
+void deleteMenu(std::string updateIC, std::string updateName, std::string updatePhoneNum, std::string updateBirthDate, std::string updateHireDate, std::string updateEmail) {
+	std::string tmpAns;
+	do {
+		std::cout << "Confirm deletion of the record? (y/n): ";
+        std::getline(std::cin, tmpAns);
+            
+        if (tmpAns.empty()) {
+        	std::cout << "Error: Input cannot be empty. Please enter a valid input\n";
+            continue;
+        }
+        if (!validateRegex(tmpAns, "^[ynYN]$")) {
+        	std::cout << "INPUT_ERROR\n";
+            continue;
+        }
+        break;  // Input is valid, exit the loop.
+	} while(true);   
+    if (tmpAns == "Y" || tmpAns == "y") {
+		records.erase(updateIC,updateName,updatePhoneNum,updateBirthDate, updateHireDate, updateEmail)
+		return;
+    }   	
+    else if (tmpAns == "n" || tmpAns == "N") {
+    	return;
+    }
+}
+*/
+
+void updataRecord(std::vector<Record>& records) {
+	std::string tmpUserInputIC;
+	//std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	do {
+        std::cout << "Please type in existing employee's IC (< 10 chars) : "; // testing asnwer: sample-50-recs.csv
+        std::getline(std::cin, tmpUserInputIC); 
+		
+        if (tmpUserInputIC.empty()) {
+            std::cout << "Error: Input cannot be empty. Please enter a valid ic.\n";
+            continue;
+        }
+        else if (!validateRegex(tmpUserInputIC,R"(^[A-Za-z0-9]{1,9}$)")) {
+            std::cout << "INPUT_ERROR\n";
+            continue;
+        }
+		break;
+    } while (true); // Repeat until a valid filename is entered
+    
+	bool found = false;
+	int matchCount  = 0;
+	int updateOption;
+	
+    for (auto &rec : records) {
+		if (rec.IC == tmpUserInputIC) {
+			if (!found) {
+                std::cout << "\n======================================================================================================================\n";
+                std::cout << std::left 
+                          << std::setw(11) << "IC"
+                          << std::setw(36) << "Name"
+                          << std::setw(16) << "Phone"
+                          << std::setw(16) << "Birth Date"
+                          << std::setw(16) << "Hired Date"
+                          << "Email" 
+                          << std::endl;
+                std::cout << "======================================================================================================================\n";
+            }
+            matchCount ++;
+            std::cout << std::left
+                      << std::setw(11) << rec.IC
+                      << std::setw(36) << rec.Name
+                      << std::setw(16) << rec.PhoneNum
+                      << std::setw(16) << rec.BirthDate
+                      << std::setw(16) << rec.HireDate
+                      << rec.Email
+                      << std::endl;
+			std::cout <<"\n" << matchCount << " records found with IC EXACTLY matching '"<<tmpUserInputIC<<"'" <<std::endl;
+            found = true;
+            do {
+            	updateOption = updateMenu(rec.IC, rec.Name, rec.PhoneNum, rec.BirthDate, rec.HireDate, rec.Email);
+				std::cout << std::endl;
+				switch (updateOption) {
+					case 1:
+						rec.IC = updateEmployeeIC(records, rec.IC);
+						break;
+					case 2:
+						rec.Email = updateEmployeeEmail(records, rec.Email);
+						break;
+					case 3:
+						rec.Name = updateEmployeeName(records, rec.Name);
+						break;
+					case 4:
+						rec.PhoneNum = updateEmployeePhoneNum(records, rec.PhoneNum);
+						break;
+					case 5:
+				    	rec.BirthDate = updateEmployeeBirthDate(records, rec.BirthDate);
+    					break;
+					case 6:
+						rec.HireDate = updateEmployeeHireDate(records, rec.HireDate);
+    					break;
+					case 7:
+					    submitEmployeeRecordUpdate(records, rec);
+    					break;
+					default:
+						std::cout<< "Invalid Choice => " << updateOption << ", please try again!" << std::endl;;
+				}
+            }while(updateOption !=7);     	
+			}
+		}	
+	if (!found) {
+		std::cout << "Error! IC No. '" << tmpUserInputIC << "' DOES NOT exists in employee records DB!"<< std::endl;
+	}
+}
+
+void deleteRecord(std::vector<Record>& records) {
+    std::string tmpUserInputIC;
+    std::string tmpAns;
+    bool found = false;
+    int matchCount = 0;
+
+    // Ask for a valid IC.
+    do {
+        std::cout << "Please type in existing employee's IC (< 10 chars): ";
+        std::getline(std::cin, tmpUserInputIC);
+        
+        tmpUserInputIC = trim(tmpUserInputIC);
+        
+        if (tmpUserInputIC.empty()) {
+            std::cout << "Error: Input cannot be empty. Please enter a valid IC.\n";
+            continue;
+        }
+        else if (!validateRegex(tmpUserInputIC, R"(^[A-Za-z0-9]{1,9}$)")) {
+            std::cout << "INPUT_ERROR\n";
+            continue;
+        }
+        break;
+    } while (true);
+    
+    // Iterate over the records using an iterator to safely erase matching records.
+    for (auto it = records.begin(); it != records.end(); ) {
+        if (it->IC == tmpUserInputIC) {
+            found = true;
+            matchCount++;
+            
+            // Display header once for the first match.
+            if (matchCount == 1) {
+                std::cout << "\n======================================================================================================================\n";
+                std::cout << std::left 
+                          << std::setw(8)  << "Idx"
+                          << std::setw(11) << "IC"
+                          << std::setw(36) << "Name"
+                          << std::setw(16) << "Phone"
+                          << std::setw(16) << "Birth Date"
+                          << std::setw(16) << "Hired Date"
+                          << "Email" 
+                          << std::endl;
+                std::cout << "======================================================================================================================\n";
+            }
+            
+            // Display the matching record.
+            std::cout << std::left
+                      << std::setw(8)  << it->Idx
+                      << std::setw(11) << it->IC
+                      << std::setw(36) << it->Name
+                      << std::setw(16) << it->PhoneNum
+                      << std::setw(16) << it->BirthDate
+                      << std::setw(16) << it->HireDate
+                      << it->Email
+                      << std::endl;
+            std::cout << "\n" << matchCount 
+                      << " record(s) found with IC EXACTLY matching '" 
+                      << tmpUserInputIC << "'" << std::endl;
+            
+            // Confirm deletion.
+            do {
+                std::cout << "Confirm deletion of the record? (y/n): ";
+                std::getline(std::cin, tmpAns);
+                
+                if (tmpAns.empty()) {
+                    std::cout << "Error: Input cannot be empty. Please enter a valid input\n";
+                    continue;
+                }
+                if (!validateRegex(tmpAns, R"(^[yYnN]$)")) {
+                    std::cout << "INPUT_ERROR\n";
+                    continue;
+                }
+                break;
+            } while (true);
+            
+            if (tmpAns == "Y" || tmpAns == "y") {
+                // Erase the record; erase returns an iterator to the next element.
+                it = records.erase(it);
+                std::cout << "Record deleted successfully.\n";
+            } else {
+                ++it;
+            }
+        } else {
+            ++it;
+        }
+    }
+    
+    if (!found) {
+        std::cout << "Error! IC No. '" << tmpUserInputIC 
+                  << "' DOES NOT exist in the employee records DB!\n";
+    }
+    
+    // Update the Idx for all remaining records so that the array indices are shifted.
+    for (size_t i = 0; i < records.size(); i++) {
+        records[i].Idx = static_cast<int>(i + 1);
+    }
+}

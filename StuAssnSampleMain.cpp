@@ -98,15 +98,15 @@ int main()
                 break;
 
             case 8:
-                	insertNewRecord(records);
+                insertNewRecord(records);
                 break;
 
             case 9:
-                cout << "Design your own function(s) to handle: Search (by ic) & UPDATE Existing Employee Record" << endl;
+            	updataRecord(records);
                 break;
 
             case 10:
-                cout << "Design your own function(s) to handle: Search (by ic) & DELETE Existing Employee Record" << endl;
+                deleteRecord(records);
                 break;
 
             case 11:
