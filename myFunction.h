@@ -47,5 +47,7 @@ void updataRecord(std::vector<Record>& records);
 
 void deleteRecord(std::vector<Record>& records);
 
+void exportRecord(std::vector<Record>& records);
+
 #endif
 

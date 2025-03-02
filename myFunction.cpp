@@ -109,21 +109,41 @@ std::string formatDate(const std::string &date) {
 }
 
 void loadCSV(const std::string &filename, std::vector<Record> &records, int limit) {
-	
-
     std::ifstream file(filename);
+	std::string line;
+        
     if (!file.is_open()) {
         std::cerr << "Error opening file." << std::endl;
         return;
     }
     
     if (captureCount > 1) {
-    	std::cerr << "You already captured the file" <<std::endl;
-    	return;
+        std::cerr << "You already captured the file" << std::endl;
+        return;
     }
     
-    std::string line;
-    std::getline(file, line); // Skip header
+    // Read the header line.
+    if (!std::getline(file, line)) {
+        std::cerr << "Error reading header." << std::endl;
+        return;
+    }
+    
+    // Split header into tokens.
+    std::istringstream headerStream(line);
+    std::string token;
+    std::vector<std::string> headerTokens;
+    while (std::getline(headerStream, token, ',')) {
+        headerTokens.push_back(trim(token));
+    }
+    
+    // Determine if the CSV file has an index column in the first column.
+    bool hasIndex = false;
+    if (!headerTokens.empty()) {
+        std::string firstToken = headerTokens[0];
+        if (firstToken == "Idx") {
+            hasIndex = true;
+        }
+    }
     
     int count = 0;
     while (std::getline(file, line) && count < limit) {
@@ -131,9 +151,14 @@ void loadCSV(const std::string &filename, std::vector<Record> &records, int limi
         Record record;
         std::string field;
         
-        std::getline(ss, field, ',');
-        record.Idx = std::stoi(field);
+        if (hasIndex) {
+            std::getline(ss, field, ','); // read and ignore the index field
+            record.Idx = count + 1; // assign our own index
+        } else {
+            record.Idx = count + 1;
+        }
         
+        // Read the remaining fields.
         std::getline(ss, record.Name, ',');
         std::getline(ss, record.Email, ',');
         std::getline(ss, record.IC, ',');
@@ -143,9 +168,9 @@ void loadCSV(const std::string &filename, std::vector<Record> &records, int limi
         std::getline(ss, record.BirthDate, ',');
         record.BirthDate = formatDate(record.BirthDate);
 
-        if (count+1 == limit) { 
-        	std::cout << "\nMaximum number of records reached. Ignoring addtional data from file "<< filename<<std::endl;
-            std::cout << "Done! Total no. of records read in and stored in DB " << limit<< std::endl;
+        if (count + 1 == limit) { 
+            std::cout << "\nMaximum number of records reached. Ignoring additional data from file " << filename << std::endl;
+            std::cout << "Done! Total no. of records read in and stored in DB " << limit << std::endl;
         }
         
         records.push_back(record);
@@ -879,6 +904,7 @@ void insertNewRecord(std::vector<Record>& records) {
             std::cout << "INPUT_ERROR\n";
             continue;
         }
+        std::replace(newRecord.BirthDate.begin(), newRecord.BirthDate.end(), '-', '/');
 		break;
     } while (true); 
     
@@ -896,6 +922,7 @@ void insertNewRecord(std::vector<Record>& records) {
             std::cout << "INPUT_ERROR\n";
             continue;
         }
+        std::replace(newRecord.HireDate.begin(), newRecord.HireDate.end(), '-', '/');
 		break;
     } while (true); 
     
@@ -1243,32 +1270,6 @@ void submitEmployeeRecordUpdate(std::vector<Record>& records, Record& rec) {
     std::cout<<"Done! Going back to main menu ..."<<std::endl;
 }
 
-/*
-void deleteMenu(std::string updateIC, std::string updateName, std::string updatePhoneNum, std::string updateBirthDate, std::string updateHireDate, std::string updateEmail) {
-	std::string tmpAns;
-	do {
-		std::cout << "Confirm deletion of the record? (y/n): ";
-        std::getline(std::cin, tmpAns);
-            
-        if (tmpAns.empty()) {
-        	std::cout << "Error: Input cannot be empty. Please enter a valid input\n";
-            continue;
-        }
-        if (!validateRegex(tmpAns, "^[ynYN]$")) {
-        	std::cout << "INPUT_ERROR\n";
-            continue;
-        }
-        break;  // Input is valid, exit the loop.
-	} while(true);   
-    if (tmpAns == "Y" || tmpAns == "y") {
-		records.erase(updateIC,updateName,updatePhoneNum,updateBirthDate, updateHireDate, updateEmail)
-		return;
-    }   	
-    else if (tmpAns == "n" || tmpAns == "N") {
-    	return;
-    }
-}
-*/
 
 void updataRecord(std::vector<Record>& records) {
 	std::string tmpUserInputIC;
@@ -1449,4 +1450,51 @@ void deleteRecord(std::vector<Record>& records) {
     for (size_t i = 0; i < records.size(); i++) {
         records[i].Idx = static_cast<int>(i + 1);
     }
+}
+
+
+void exportRecord(std::vector<Record>& records) {
+    std::string fileName;
+    int count = 0;
+    
+    do {
+        std::cout << "Enter file name to export data: ";
+        std::getline(std::cin, fileName);
+        fileName = trim(fileName);
+        if (fileName.empty()) {
+            std::cout << "Error: File name cannot be empty. Please try again.\n";
+        } else {
+            break;
+        }
+    } while (true);
+    
+    // add".csv" if never input it in
+    if (fileName.find('.') == std::string::npos) {
+        fileName += ".csv";
+    }
+    
+    if (records.empty()) {
+    	std::cout << "No data captured !"<<std::endl;
+    	return;
+    }
+    
+    std::ofstream outFile(fileName);
+    
+    // Write the header row.
+    outFile << "Idx,Name,Email,IC,PhoneNum,HireDate,BirthDate\n";
+    
+    // Write each record as a row in CSV format.
+    for (const auto &rec : records) {
+        outFile << rec.Idx << ','
+        		<< rec.Name << ','
+        		<< rec.Email << ','
+                << rec.IC << ','
+                << rec.PhoneNum << ','
+                << rec.HireDate << ','
+                << rec.BirthDate << '\n';
+		count++;
+    }
+    
+    outFile.close();
+    std::cout << "Done! Total no. of records written to output file '" << fileName << "' = " << count <<" records"<<std::endl;
 }

@@ -62,7 +62,7 @@ int main()
                 //datanum = std::stoi(getUserInputQ2());
                 //empDBSize = datanum;
                 //loadCSV(filename, records, datanum); //"sample-50-recs.csv"
-                loadCSV("sample-50-recs.csv", records, 20); //"sample-50-recs.csv"
+                loadCSV("sample-50-recs-no-idx.csv", records, 20); //"sample-50-recs.csv"
                 break;
 
             case 3:
@@ -110,7 +110,7 @@ int main()
                 break;
 
             case 11:
-                cout << "Design your own function(s) to handle: Write Data From Employee DB To File" << endl;
+                exportRecord(records);
                 break;
 
             case 12:
