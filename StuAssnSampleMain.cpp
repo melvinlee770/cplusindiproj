@@ -57,12 +57,13 @@ int main()
                 break;
 
             case 2:
+            	//std::cout<<MAX_NO_OF_RECORDS<<std::endl;
                 //printHelloWorld();
-                //filename = getUserInputQ1();
+                filename = getUserInputQ1();
                 //datanum = std::stoi(getUserInputQ2());
                 //empDBSize = datanum;
-                //loadCSV(filename, records, datanum); //"sample-50-recs.csv"
-                loadCSV("sample-50-recs-no-idx.csv", records, 20); //"sample-50-recs.csv"
+                loadCSV(filename, records, MAX_NO_OF_RECORDS); //"sample-50-recs.csv"
+                //loadCSV("sample-50-recs-no-idx.csv", records, 20); //"sample-50-recs.csv"
                 break;
 
             case 3:

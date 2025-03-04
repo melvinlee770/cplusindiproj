@@ -52,7 +52,7 @@ bool validateRegex(const std::string& input, const std::string& pattern) {
 
 std::string getUserInputQ1() {
 	std::string tmpfilename;
-	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	//std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	do {
         std::cout << "Enter the CSV filename: "; // testing asnwer: sample-50-recs.csv
         std::getline(std::cin, tmpfilename); 
@@ -108,6 +108,7 @@ std::string formatDate(const std::string &date) {
     return formattedDate.str();
 }
 
+/*
 void loadCSV(const std::string &filename, std::vector<Record> &records, int limit) {
     std::ifstream file(filename);
 	std::string line;
@@ -167,16 +168,92 @@ void loadCSV(const std::string &filename, std::vector<Record> &records, int limi
         record.HireDate = formatDate(record.HireDate);
         std::getline(ss, record.BirthDate, ',');
         record.BirthDate = formatDate(record.BirthDate);
-
-        if (count + 1 == limit) { 
+		std::cout << count << std::endl;
+        if (count + 1> limit) {
             std::cout << "\nMaximum number of records reached. Ignoring additional data from file " << filename << std::endl;
             std::cout << "Done! Total no. of records read in and stored in DB " << limit << std::endl;
+            break;
         }
-        
         records.push_back(record);
         count++;
         captureCount++;
     }
+    std::cout << "Done! Total no. of records read in and stored in DB " << count << std::endl;
+    file.close();
+}
+*/
+
+
+void loadCSV(const std::string &filename, std::vector<Record> &records, int limit) {
+    std::ifstream file(filename);
+    std::string line;
+
+    if (!file.is_open()) {
+        std::cerr << "Error opening file." << std::endl;
+        return;
+    }
+
+    if (captureCount > 1) {
+        std::cerr << "You already captured the file" << std::endl;
+        return;
+    }
+
+    // Read and process header
+    if (!std::getline(file, line)) {
+        std::cerr << "Error reading header." << std::endl;
+        return;
+    }
+
+    std::istringstream headerStream(line);
+    std::vector<std::string> headerTokens;
+    std::string token;
+
+    while (std::getline(headerStream, token, ',')) {
+        headerTokens.push_back(trim(token));
+    }
+
+    bool hasIndex = !headerTokens.empty() && headerTokens[0] == "Idx";
+
+    int count = 0;
+    while (std::getline(file, line)) {
+        if (count >= limit) {
+        	std::cout << "\nMaximum number of records reached. Ignoring additional data from file " << filename << std::endl;
+            std::cout << "Done! Total no. of records read in and stored in DB " << limit << std::endl;
+            file.close();
+            return; // Stops function immediately
+        }
+
+        std::stringstream ss(line);
+        Record record;
+        std::string field;
+
+        if (hasIndex) {
+            std::getline(ss, field, ',');
+            try {
+                record.Idx = std::stoi(field);
+            } catch (...) {
+                record.Idx = count + 1;
+            }
+        } else {
+            record.Idx = count + 1;
+        }
+
+        std::getline(ss, record.Name, ',');
+        std::getline(ss, record.Email, ',');
+        std::getline(ss, record.IC, ',');
+        std::getline(ss, record.PhoneNum, ',');
+        std::getline(ss, record.HireDate, ',');
+        record.HireDate = formatDate(record.HireDate);
+        std::getline(ss, record.BirthDate, ',');
+        record.BirthDate = formatDate(record.BirthDate);
+
+        records.push_back(record);
+        count++;
+    }
+
+    std::cout << "Done! Total no. of records read in and stored in DB: " << count << std::endl;
+    captureCount++;  // Increment once after processing
+
     file.close();
 }
 
