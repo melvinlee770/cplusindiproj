@@ -1374,6 +1374,10 @@ void deleteRecord(std::vector<Record>& records) {
 
     // Ask for a valid IC.
     do {
+   		if (records.empty()) {
+    		std::cout << "No data captured !"<<std::endl;
+    		return;
+    	}
         std::cout << "Please type in existing employee's IC (< 10 chars): ";
         std::getline(std::cin, tmpUserInputIC);
         
