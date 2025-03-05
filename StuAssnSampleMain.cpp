@@ -21,7 +21,6 @@ int empDBSize = 0;
 // Function prototypes
 void printWelcomeMsg();
 int printMainMenuOptions();
-int queryCurrentNoOfEmpRecs();
 int pirntSearchICMenu();
 int printSearchNameMenu();
 int printSearchEmailMenu();
@@ -52,7 +51,7 @@ int main()
         switch (userEnteredNumber) {
             case 1:
                 cout << endl;
-                cout << "Current no. of Employee Records in Database : " << queryCurrentNoOfEmpRecs() << endl;
+                cout << "Current no. of Employee Records in Database : " << queryCurrentNoOfEmpRecs(records) << endl;
                 cout << endl;
                 break;
 
@@ -61,7 +60,6 @@ int main()
                 //printHelloWorld();
                 filename = getUserInputQ1();
                 //datanum = std::stoi(getUserInputQ2());
-                //empDBSize = datanum;
                 loadCSV(filename, records, MAX_NO_OF_RECORDS); //"sample-50-recs.csv"
                 //loadCSV("sample-50-recs-no-idx.csv", records, 20); //"sample-50-recs.csv"
                 break;
@@ -180,12 +178,6 @@ int printMainMenuOptions() {
     
 
 }
-
-int queryCurrentNoOfEmpRecs () 
-{
-  return (empDBSize);
-}   // end queryCurrentNoOfEmpRecs () ...
-
 
 int pirntSearchICMenu() {
 	std::string tmpUserEnteredNumberICMenu;

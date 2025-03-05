@@ -110,79 +110,6 @@ std::string formatDate(const std::string &date) {
     return formattedDate.str();
 }
 
-/*
-void loadCSV(const std::string &filename, std::vector<Record> &records, int limit) {
-    if (capturedFiles.find(filename) != capturedFiles.end()) {
-        std::cerr << "Error: The file '" << filename << "' has already been captured!" << std::endl;
-        return;
-    }
-
-    std::ifstream file(filename);
-    std::string line;
-
-    if (!file.is_open()) {
-        std::cerr << "Error opening file: " << filename << std::endl;
-        return;
-    }
-
-    // Read and process header
-    if (!std::getline(file, line)) {
-        std::cerr << "Error reading header from: " << filename << std::endl;
-        return;
-    }
-
-    std::istringstream headerStream(line);
-    std::vector<std::string> headerTokens;
-    std::string token;
-
-    while (std::getline(headerStream, token, ',')) {
-        headerTokens.push_back(trim(token));
-    }
-
-    bool hasIndex = !headerTokens.empty() && headerTokens[0] == "Idx";
-
-    int count = 0;
-    while (std::getline(file, line)) {
-        if (count >= limit) {
-            std::cout << "\nMaximum number of records reached. Ignoring additional data from file " << filename << std::endl;
-            std::cout << "Done! Total no. of records read in and stored in DB: " << limit << std::endl;
-            break;
-        }
-
-        std::stringstream ss(line);
-        Record record;
-        std::string field;
-
-        if (hasIndex) {
-            std::getline(ss, field, ','); // Skip the first column (existing index)
-        }
-
-        // Assign a continuous global index number
-        record.Idx = captureIndex++;
-
-        std::getline(ss, record.Name, ',');
-        std::getline(ss, record.Email, ',');
-        std::getline(ss, record.IC, ',');
-        std::getline(ss, record.PhoneNum, ',');
-        std::getline(ss, record.HireDate, ',');
-        record.HireDate = formatDate(record.HireDate);
-        std::getline(ss, record.BirthDate, ',');
-        record.BirthDate = formatDate(record.BirthDate);
-
-        records.push_back(record);
-        count++;
-    }
-
-    std::cout << "Done! Total no. of records read in and stored in DB: " << count << std::endl;
-
-    // Mark this file as processed
-    capturedFiles.insert(filename);
-
-    file.close();
-}
-*/
-
-
 void loadCSV(const std::string &filename, std::vector<Record> &records, int limit) {
     if (capturedFiles.find(filename) != capturedFiles.end()) {
         std::cerr << "Error: The file '" << filename << "' has already been captured!" << std::endl;
@@ -259,6 +186,12 @@ void loadCSV(const std::string &filename, std::vector<Record> &records, int limi
     file.close();
 }
 
+size_t queryCurrentNoOfEmpRecs (const std::vector<Record>& records) 
+{
+  return records.size();
+}   
+
+
 void displayRecords(const std::vector<Record> &records) {
 
     if (records.empty()) {
@@ -282,7 +215,7 @@ void displayRecords(const std::vector<Record> &records) {
         }
 		break;
     } while (true); // Repeat until a valid filename is entered
-
+	std::cout<< "All Employee Records (total = "<< queryCurrentNoOfEmpRecs(records) <<")..."<<std::endl;
 	if(tmpIndex == "y" || tmpIndex == "Y") {
 		std::cout << "======================================================================================================================\n";
    		std::cout << std::left 
@@ -296,10 +229,10 @@ void displayRecords(const std::vector<Record> &records) {
         << std::endl;
 		std::cout << "======================================================================================================================\n";
 		std::cout<<std::endl;
-	
+		size_t index = 0;
 		for (const auto &rec : records) {
         	std::cout << std::left
-            << std::setw(8)  << rec.Idx
+            << std::setw(8)  << index++
             << std::setw(11) << rec.IC
         	<< std::setw(36) << rec.Name
             << std::setw(16) << rec.PhoneNum
@@ -876,7 +809,7 @@ std::string getUserInputPhoneNumWithConfirmation(const std::vector<Record>& reco
     std::string tmpUserInputPhoneNum;
     std::string tmpAns;
     while (true) {
-        std::cout << "Please type in employee's phone number (< 35 chars): ";
+        std::cout << "Please type in employee's phone number (< 15 chars): ";
         std::getline(std::cin, tmpUserInputPhoneNum);
         
         if (tmpUserInputPhoneNum.empty()) {

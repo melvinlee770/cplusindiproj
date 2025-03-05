@@ -30,6 +30,7 @@ bool validateRegex(const std::string& input, const std::string& pattern);
 void printHelloWorld();
 
 void loadCSV(const std::string &filename, std::vector<Record> &records, int limit);
+size_t queryCurrentNoOfEmpRecs(const std::vector<Record>& records);
 void displayRecords(const std::vector<Record> &records);
 std::string formatDate(const std::string &date);
              
