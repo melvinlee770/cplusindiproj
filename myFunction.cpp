@@ -6,12 +6,14 @@
 #include <limits>
 #include <regex> 	
 #include <iomanip>
-
+#include <set>
 #include <algorithm>
 #include <cctype>
 #include <locale>
 
 int captureCount = 1; 
+int captureIndex = 0;
+std::set<std::string> capturedFiles;
 
 std::string userInputIC = "00";
 std::string userInputName = "SAMPLE_NAME";
@@ -110,97 +112,22 @@ std::string formatDate(const std::string &date) {
 
 /*
 void loadCSV(const std::string &filename, std::vector<Record> &records, int limit) {
-    std::ifstream file(filename);
-	std::string line;
-        
-    if (!file.is_open()) {
-        std::cerr << "Error opening file." << std::endl;
+    if (capturedFiles.find(filename) != capturedFiles.end()) {
+        std::cerr << "Error: The file '" << filename << "' has already been captured!" << std::endl;
         return;
     }
-    
-    if (captureCount > 1) {
-        std::cerr << "You already captured the file" << std::endl;
-        return;
-    }
-    
-    // Read the header line.
-    if (!std::getline(file, line)) {
-        std::cerr << "Error reading header." << std::endl;
-        return;
-    }
-    
-    // Split header into tokens.
-    std::istringstream headerStream(line);
-    std::string token;
-    std::vector<std::string> headerTokens;
-    while (std::getline(headerStream, token, ',')) {
-        headerTokens.push_back(trim(token));
-    }
-    
-    // Determine if the CSV file has an index column in the first column.
-    bool hasIndex = false;
-    if (!headerTokens.empty()) {
-        std::string firstToken = headerTokens[0];
-        if (firstToken == "Idx") {
-            hasIndex = true;
-        }
-    }
-    
-    int count = 0;
-    while (std::getline(file, line) && count < limit) {
-        std::stringstream ss(line);
-        Record record;
-        std::string field;
-        
-        if (hasIndex) {
-            std::getline(ss, field, ','); // read and ignore the index field
-            record.Idx = count + 1; // assign our own index
-        } else {
-            record.Idx = count + 1;
-        }
-        
-        // Read the remaining fields.
-        std::getline(ss, record.Name, ',');
-        std::getline(ss, record.Email, ',');
-        std::getline(ss, record.IC, ',');
-        std::getline(ss, record.PhoneNum, ',');
-        std::getline(ss, record.HireDate, ',');
-        record.HireDate = formatDate(record.HireDate);
-        std::getline(ss, record.BirthDate, ',');
-        record.BirthDate = formatDate(record.BirthDate);
-		std::cout << count << std::endl;
-        if (count + 1> limit) {
-            std::cout << "\nMaximum number of records reached. Ignoring additional data from file " << filename << std::endl;
-            std::cout << "Done! Total no. of records read in and stored in DB " << limit << std::endl;
-            break;
-        }
-        records.push_back(record);
-        count++;
-        captureCount++;
-    }
-    std::cout << "Done! Total no. of records read in and stored in DB " << count << std::endl;
-    file.close();
-}
-*/
 
-
-void loadCSV(const std::string &filename, std::vector<Record> &records, int limit) {
     std::ifstream file(filename);
     std::string line;
 
     if (!file.is_open()) {
-        std::cerr << "Error opening file." << std::endl;
-        return;
-    }
-
-    if (captureCount > 1) {
-        std::cerr << "You already captured the file" << std::endl;
+        std::cerr << "Error opening file: " << filename << std::endl;
         return;
     }
 
     // Read and process header
     if (!std::getline(file, line)) {
-        std::cerr << "Error reading header." << std::endl;
+        std::cerr << "Error reading header from: " << filename << std::endl;
         return;
     }
 
@@ -217,10 +144,9 @@ void loadCSV(const std::string &filename, std::vector<Record> &records, int limi
     int count = 0;
     while (std::getline(file, line)) {
         if (count >= limit) {
-        	std::cout << "\nMaximum number of records reached. Ignoring additional data from file " << filename << std::endl;
-            std::cout << "Done! Total no. of records read in and stored in DB " << limit << std::endl;
-            file.close();
-            return; // Stops function immediately
+            std::cout << "\nMaximum number of records reached. Ignoring additional data from file " << filename << std::endl;
+            std::cout << "Done! Total no. of records read in and stored in DB: " << limit << std::endl;
+            break;
         }
 
         std::stringstream ss(line);
@@ -228,15 +154,11 @@ void loadCSV(const std::string &filename, std::vector<Record> &records, int limi
         std::string field;
 
         if (hasIndex) {
-            std::getline(ss, field, ',');
-            try {
-                record.Idx = std::stoi(field);
-            } catch (...) {
-                record.Idx = count + 1;
-            }
-        } else {
-            record.Idx = count + 1;
+            std::getline(ss, field, ','); // Skip the first column (existing index)
         }
+
+        // Assign a continuous global index number
+        record.Idx = captureIndex++;
 
         std::getline(ss, record.Name, ',');
         std::getline(ss, record.Email, ',');
@@ -252,7 +174,87 @@ void loadCSV(const std::string &filename, std::vector<Record> &records, int limi
     }
 
     std::cout << "Done! Total no. of records read in and stored in DB: " << count << std::endl;
-    captureCount++;  // Increment once after processing
+
+    // Mark this file as processed
+    capturedFiles.insert(filename);
+
+    file.close();
+}
+*/
+
+
+void loadCSV(const std::string &filename, std::vector<Record> &records, int limit) {
+    if (capturedFiles.find(filename) != capturedFiles.end()) {
+        std::cerr << "Error: The file '" << filename << "' has already been captured!" << std::endl;
+        return;
+    }
+
+    std::ifstream file(filename);
+    std::string line;
+
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filename << std::endl;
+        return;
+    }
+
+    // Find the last index number in records
+    int globalIdx = 1; // Start from 1 if no records exist
+    if (!records.empty()) {
+        globalIdx = records.back().Idx + 1; // Continue from the last recorded index
+    }
+
+    // Read and process header
+    if (!std::getline(file, line)) {
+        std::cerr << "Error reading header from: " << filename << std::endl;
+        return;
+    }
+
+    std::istringstream headerStream(line);
+    std::vector<std::string> headerTokens;
+    std::string token;
+
+    while (std::getline(headerStream, token, ',')) {
+        headerTokens.push_back(trim(token));
+    }
+
+    bool hasIndex = !headerTokens.empty() && headerTokens[0] == "Idx";
+
+    int count = 0;
+    while (std::getline(file, line)) {
+        if (count >= limit) {
+            std::cout << "\nMaximum number of records reached. Ignoring additional data from file " << filename << std::endl;
+            std::cout << "Done! Total no. of records read in and stored in DB: " << limit << std::endl;
+            break;
+        }
+
+        std::stringstream ss(line);
+        Record record;
+        std::string field;
+
+        if (hasIndex) {
+            std::getline(ss, field, ','); // Skip the first column (existing index)
+        }
+
+        // Assign a continuous global index number
+        record.Idx = globalIdx++;
+
+        std::getline(ss, record.Name, ',');
+        std::getline(ss, record.Email, ',');
+        std::getline(ss, record.IC, ',');
+        std::getline(ss, record.PhoneNum, ',');
+        std::getline(ss, record.HireDate, ',');
+        record.HireDate = formatDate(record.HireDate);
+        std::getline(ss, record.BirthDate, ',');
+        record.BirthDate = formatDate(record.BirthDate);
+
+        records.push_back(record);
+        count++;
+    }
+
+    std::cout << "Done! Total no. of records read in and stored in DB: " << count << std::endl;
+
+    // Mark this file as processed
+    capturedFiles.insert(filename);
 
     file.close();
 }
@@ -920,7 +922,7 @@ void insertNewRecord(std::vector<Record>& records) {
     Record newRecord;
     
     // Determine new index: if records are empty, start at 1; otherwise, use the last record's index + 1.
-    newRecord.Idx = records.empty() ? 1 : records.back().Idx + 1;
+    newRecord.Idx = records.empty() ? 0 : records.back().Idx + 1;
     std::cout << "\n--- Inserting New Record ---\n";
     
     newRecord.Name = getUserInputNameWithConfirmation(records);
